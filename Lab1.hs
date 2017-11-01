@@ -27,5 +27,6 @@ power2 n k = if even k then power2 (n*n) (div k 2) else n * (power2 (n) (k-1))
 -- Since our functions are not defined for negative inputs we wan't to assert this by feeding negative numbers to check that an error occurs.
 -- Finally test for a few positive numbers and compare the results between the three functions to assert that the answer is correct.
 -- B
-prop_powers n k = if (((power n k) == (power1 n k)) && (power n k) == (power2 n k)) then putStrLn "Match" else putStrLn "Doesn't match"
+
+prop_powers n k = (power n k) == (power1 n k) && (power n k) == (power2 n k)
 -- C
