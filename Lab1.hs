@@ -30,6 +30,6 @@ power2 n k = if even k then power2 (n*n) (div k 2) else n * (power2 n (k-1))
 -- B
 
 prop_powers :: Integer -> Integer -> Bool
-prop_powers n k = (n^absK == power1 n absK) && (n^absK == power2 n absK)
+prop_powers n k = (power n absK == power1 n absK) && (power n absK == power2 n absK)
   where absK = abs k
 -- C
