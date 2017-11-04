@@ -1,49 +1,63 @@
-module RunGame where
+-- | Data types for card games
+module Cards where
 
-import Data.Char
+import Test.QuickCheck
 import System.Random
-import Cards
 
--- | The interface to the students' implementation.
-data Interface = Interface
-  { iEmpty    :: Hand
-  , iFullDeck :: Hand
-  , iValue    :: Hand -> Integer
-  , iGameOver :: Hand -> Bool
-  , iWinner   :: Hand -> Hand -> Player
-  , iDraw     :: Hand -> Hand -> (Hand, Hand)
-  , iPlayBank :: Hand -> Hand
-  , iShuffle  :: StdGen -> Hand -> Hand
-  }
+-- | A card has a rank and belongs to a suit.
+data Card = Card { rank :: Rank, suit :: Suit }
+            deriving (Eq, Show)
 
--- | A type of players.
-data Player = Guest | Bank
-              deriving (Show, Eq)
+instance Arbitrary Card where
+  arbitrary = do suit <- arbitrary
+                 rank <- arbitrary
+                 return (Card rank suit)
 
--- | Runs a game given an implementation of the interface.
-runGame :: Interface -> IO ()
-runGame i =
-  do putStrLn "Welcome to the game."
-     g <- newStdGen
-     gameLoop i (iShuffle i g (iFullDeck i)) (iEmpty i)
+-- | All the different suits.
+data Suit = Hearts | Spades | Diamonds | Clubs
+            deriving (Eq, Show)
 
--- | Play until the guest player is bust or chooses to stop.
-gameLoop :: Interface -> Hand -> Hand -> IO ()
-gameLoop i deck guest =
-  do putStrLn ("Your current score: " ++ show (iValue i guest))
-     if iGameOver i guest
-       then finish i deck guest
-       else do putStrLn "Draw another card? [y]"
-               yn <- getLine
-               if null yn || not (map toLower yn == "n")
-                 then do let (deck', guest') = iDraw i deck guest
-                         gameLoop i deck' guest'
-                 else finish i deck guest
+instance Arbitrary Suit where
+  arbitrary = oneof [ return Hearts, return Spades
+                    , return Diamonds, return Clubs ]
 
--- | Display the bank's final score and the winner.
-finish :: Interface -> Hand -> Hand -> IO ()
-finish i deck guest =
-  do putStrLn ("The bank's final score: " ++ show (iValue i bank))
-     putStrLn ("Winner: " ++ show (iWinner i guest bank))
-  where
-    bank = iPlayBank i deck
+-- | A rank is either a numeric card, a face card, or an ace. The
+-- numeric cards range from two to ten.
+data Rank = Numeric Integer | Jack | Queen | King | Ace
+            deriving (Eq, Show)
+
+instance Arbitrary Rank where
+  arbitrary = frequency [ (1, return Jack)
+                        , (1, return Queen)
+                        , (1, return King)
+                        , (1, return Ace)
+                        , (9, do n <- choose (2, 10)
+                                 return (Numeric n))
+                        ]
+
+-- | A hand of cards. This data type can also be used to represent a
+-- deck of cards.
+data Hand = Empty | Add Card Hand
+            deriving (Eq, Show)
+
+-- | This instance on average yields larger hands than the one given in
+-- the lecture.
+instance Arbitrary Hand where
+  arbitrary = frequency [  (1,  return Empty)
+                        ,  (10, do card  <-  arbitrary
+                                   hand  <-  arbitrary
+                                   return (Add card hand))
+                        ]
+
+-- | The size of a hand.
+size :: Num a => Hand -> a
+size Empty            = 0
+size (Add card hand)  = 1 + size hand
+
+
+-- We also need to be able to generate random number generators. (This
+-- does not really belong in this file, but is placed here to reduce
+-- the number of files needed.)
+instance Arbitrary StdGen where
+  arbitrary = do n <- arbitrary
+                 return (mkStdGen n)
