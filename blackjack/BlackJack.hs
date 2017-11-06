@@ -7,3 +7,6 @@ import Test.QuickCheck
 
 
 -- Implement functions for "empty", "value", "gameOver", and "winner"
+
+empty :: Hand
+empty = Hand Empty
