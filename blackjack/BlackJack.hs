@@ -1,3 +1,9 @@
+module BlackJack where
+import Cards
+import RunGame
+
+import Test.QuickCheck
+
 -
 -----------------Lab 2, Part A-----------------------
 ------------------Task 3.1 Document------------------
@@ -20,10 +26,7 @@
 
 --------------------Part 3.4-------------------------------
 
-module BlackJack where
-import Cards
-import RunGame
-import Test.QuickCheck
+
 
 -- arbitrary hands with cards
 hand1 = Add (Card Jack Hearts) empty
@@ -38,11 +41,9 @@ empty = Empty
 -- valueRank assigning values to the rank of the card. No implementation for aces so far
 -- Face cards have a value of 10. Aces have 11 so far, and numeric cards have their number as value
 valueRank :: Rank -> Integer
-valueRank Jack = 10
-valueRank Queen = 10
-valueRank King = 10
-valueRank Ace = 11
 valueRank (Numeric i) = i
+valueRank Ace = 11
+valueRank _ = 10
 
 -- valueCard relies on valueRank to give values to each card
 valueCard :: Card -> Integer
