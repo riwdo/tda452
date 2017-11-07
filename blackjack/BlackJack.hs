@@ -1,10 +1,3 @@
-module BlackJack where
-import Cards
-import RunGame
-
-import Test.QuickCheck
-
--
 -----------------Lab 2, Part A-----------------------
 ------------------Task 3.1 Document------------------
 --We have read the document.
@@ -25,12 +18,16 @@ import Test.QuickCheck
 
 
 --------------------Part 3.4-------------------------------
+module BlackJack where
+import Cards
+import RunGame
 
+import Test.QuickCheck
 
 
 -- arbitrary hands with cards
 hand1 = Add (Card Jack Hearts) empty
-hand2 = Add (Card (Numeric 2) Hearts) (Add (Card Jack Spades) Empty)
+hand2 = Add (Card (Numeric 2) Hearts) (Add (Card Jack Spades) empty)
 hand3 = Add (Card (Numeric 5) Hearts) (Add (Card (Numeric 9) Hearts) empty)
 hand4 = Add (Card (Numeric 5) Hearts) (Add (Card (Numeric 9) Hearts) (Add (Card (Numeric 10) Hearts) empty))
 
