@@ -35,3 +35,4 @@ gameOver :: Hand -> Bool
 gameOver hand = value hand > 21
 
 winner :: Hand -> Hand -> Player
+winner guest bank = if((value guest) > (value bank)) then Guest else Bank
