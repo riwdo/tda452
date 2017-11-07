@@ -9,6 +9,7 @@ import Test.QuickCheck
 -- Implement functions for "empty", "value", "gameOver", and "winner"
 hand1 = Add (Card Jack Hearts) empty
 hand2 = Add (Card (Numeric 5) Hearts) (Add (Card (Numeric 9) Hearts) empty)
+hand5 = Add (Card (Numeric 5) Hearts) (Add (Card (Numeric 9) Hearts) (Add (Card (Numeric 10) Hearts) empty))
 hand3 = Add (Card Jack Hearts) empty
 hand4 = Add (Card Jack Hearts) empty
 
@@ -31,3 +32,8 @@ valueCard _ = 0
 value :: Hand -> Integer
 value Empty = 0
 value hand = valueCard hand
+
+gameOver :: Hand -> Bool
+gameOver hand = value hand > 21
+
+winner :: Hand -> Hand -> Player
