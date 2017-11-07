@@ -7,10 +7,9 @@ import Test.QuickCheck
 
 -- Implement functions for "empty", "value", "gameOver", and "winner"
 hand1 = Add (Card Jack Hearts) empty
-hand2 = Add (Card (Numeric 5) Hearts) (Add (Card (Numeric 9) Hearts) empty)
-hand5 = Add (Card (Numeric 5) Hearts) (Add (Card (Numeric 9) Hearts) (Add (Card (Numeric 10) Hearts) empty))
-hand3 = Add (Card Jack Hearts) empty
-hand4 = Add (Card Jack Hearts) empty
+hand2 = Add (Card (Numeric 2) Hearts) (Add (Card Jack Spades) Empty)
+hand3 = Add (Card (Numeric 5) Hearts) (Add (Card (Numeric 9) Hearts) empty)
+hand4 = Add (Card (Numeric 5) Hearts) (Add (Card (Numeric 9) Hearts) (Add (Card (Numeric 10) Hearts) empty))
 
 empty :: Hand
 empty = Empty
