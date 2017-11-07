@@ -1,4 +1,5 @@
-------------------Lab 2, Part A-----------------------
+-
+-----------------Lab 2, Part A-----------------------
 ------------------Task 3.1 Document------------------
 --We have read the document.
 
@@ -22,11 +23,7 @@
 module BlackJack where
 import Cards
 import RunGame
-
 import Test.QuickCheck
-
-
-
 
 -- arbitrary hands with cards
 hand1 = Add (Card Jack Hearts) empty
@@ -64,5 +61,7 @@ gameOver hand = value hand > 21
 -- winner decided with help from value if the bank or the guest has won.
 winner :: Hand -> Hand -> Player
 winner guest bank = if((value guest) > (value bank)) then Guest else Bank
+
+
 
 -----------------------Lab2B------------------------------
