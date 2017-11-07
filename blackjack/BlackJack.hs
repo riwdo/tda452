@@ -1,3 +1,4 @@
+------------------Lab 2, Part A-----------------------
 ------------------Task 3.1 Document------------------
 --We have read the document.
 
@@ -16,15 +17,13 @@
 -- Finally it comes to Empty) and Empty is valued 0. So it finishes up and adds +0 to the hand size. Giving us 1+1+0=2 for hand size and returns it.
 
 
-
+--------------------Part 3.4-------------------------------
 
 module BlackJack where
 import Cards
 import RunGame
 
 import Test.QuickCheck
-
---------------------Part 3.4, lab 2A-------------------------------
 
 
 
