@@ -1,8 +1,20 @@
+------------------Size calculations----------------------
+
+
+
+
+
+
+
 module BlackJack where
 import Cards
 import RunGame
 
 import Test.QuickCheck
+
+--------------------Part 3.4, lab 2A-------------------------------
+
+
 
 
 -- arbitrary hands with cards
@@ -39,3 +51,5 @@ gameOver hand = value hand > 21
 -- winner decided with help from value if the bank or the guest has won.
 winner :: Hand -> Hand -> Player
 winner guest bank = if((value guest) > (value bank)) then Guest else Bank
+
+-----------------------Lab2B------------------------------
