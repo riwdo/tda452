@@ -29,10 +29,10 @@ import Test.QuickCheck
 -- Implement functions for "empty", "value", "gameOver", and "winner"
 hand1 = Add (Card Ace Hearts) empty
 hand2 = Add (Card Ace Hearts) (Add (Card Ace Hearts) empty)
-hand5 = Add (Card (Numeric 5) Hearts) (Add (Card (Numeric 9) Hearts) (Add (Card (Numeric 10) Hearts) empty))
 hand3 = Add (Card Jack Hearts) empty
 hand4 = Add (Card Jack Hearts) empty
-
+hand5 = Add (Card (Numeric 5) Hearts) (Add (Card (Numeric 9) Hearts) (Add (Card (Numeric 10) Hearts) empty))
+hand6 = Add (Card (Numeric 5) Hearts) (Add (Card (Numeric 9) Hearts) (Add (Card (Numeric 10) Hearts) (Add (Card Ace Hearts) empty)))
 
 -- function for emptying hand
 empty :: Hand
@@ -62,13 +62,16 @@ addAces (Add card hand) = if((rank card) == Ace) then 1 + addAces hand else 0 + 
 -- if the hand is empty the value is 0 otherwise it itterates through all cards in the hand and adds their value to the value of the hand
 --
 
-value :: Hand -> Integer
-value Empty = 0
-value (Add card hand) = valueCard card + value hand
-
 getValue :: Hand -> Integer
-getValue (Add card hand) | (value (Add card hand) > 21 && addAces (Add card hand) > 0) = ((value (Add card hand)) - (addAces (Add card hand) * 10))
-                         | otherwise = value (Add card hand)
+getValue Empty = 0
+getValue (Add card hand) = valueCard card + getValue hand
+
+
+
+value :: Hand -> Integer
+value (Add card hand) | (getValue (Add card hand) > 21 && addAces (Add card hand) > 0) = ((getValue (Add card hand)) - (addAces (Add card hand) * 10))
+                         | otherwise = getValue (Add card hand)
+
 
 -- if the hand is over 21 the game is over. Relies on value function.
 gameOver :: Hand -> Bool
