@@ -35,7 +35,6 @@ hand4 = Add (Card Jack Hearts) empty
 
 
 -- function for emptying hand
-
 empty :: Hand
 empty = Empty
 
@@ -67,20 +66,23 @@ value :: Hand -> Integer
 value Empty = 0
 value (Add card hand) = valueCard card + value hand
 
-
 getValue :: Hand -> Integer
 getValue (Add card hand) | (value (Add card hand) > 21 && addAces (Add card hand) > 0) = ((value (Add card hand)) - (addAces (Add card hand) * 10))
                          | otherwise = value (Add card hand)
 
-
 -- if the hand is over 21 the game is over. Relies on value function.
 gameOver :: Hand -> Bool
-gameOver hand = value hand > 21
+gameOver hand = getValue hand > 21
 
 -- winner decided with help from value if the bank or the guest has won.
 winner :: Hand -> Hand -> Player
-winner guest bank = if((value guest) > (value bank)) then Guest else Bank
+winner guest bank = if((getValue guest) > (getValue bank)) then Guest else Bank
 
 
 
 -----------------------Lab2B------------------------------
+(<+) :: Hand -> Hand -> Hand
+(<+) Empty Empty = empty
+(<+) Empty (Add card2 hand2) = Add (Card (rank card2) (suit card2)) ((<+) Empty hand2)
+(<+) (Add card1 hand1) Empty = empty
+(<+) (Add card1 hand1) hand2 = Add (Card (rank card1) (suit card1)) ((<+) hand1 hand2)
