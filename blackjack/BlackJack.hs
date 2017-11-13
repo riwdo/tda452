@@ -45,11 +45,7 @@ valueRank (Numeric i) = i
 valueRank Ace = 11
 valueRank _ = 10
 
-
-
-
 -- valueCard relies on valueRank to give values to each card
-
 valueCard :: Card -> Integer
 valueCard card = valueRank (rank card)
 
@@ -89,3 +85,17 @@ winner guest bank = if((getValue guest) > (getValue bank)) then Guest else Bank
 (<+) Empty (Add card2 hand2) = Add (Card (rank card2) (suit card2)) ((<+) Empty hand2)
 (<+) (Add card1 hand1) Empty = empty
 (<+) (Add card1 hand1) hand2 = Add (Card (rank card1) (suit card1)) ((<+) hand1 hand2)
+
+
+listOfRanks = [Numeric 2,Numeric 3,Numeric 4,Numeric 5,Numeric 6,Numeric 7,Numeric 8,Numeric 9,Numeric 10,Jack,Queen,King,Ace]
+
+--mapsuits :: Rank -> Suit -> Hand
+--mapsuits r s = Add (Card r s)
+
+handOfSuits :: Suit -> Hand
+handOfSuits s = Add (Card (Numeric 2) s) (Add (Card (Numeric 3) s) (Add (Card (Numeric 4) s)(Add (Card (Numeric 5) s)
+                (Add (Card (Numeric 6) s)(Add (Card (Numeric 7) s)(Add (Card (Numeric 8) s)(Add (Card (Numeric 9) s)
+                (Add (Card (Numeric 10) s) (Add (Card Jack s) (Add (Card Queen s) (Add (Card King s) (Add (Card Ace s) empty))))))))))))
+
+fullDeck :: Hand
+fullDeck = handOfSuits Hearts <+ handOfSuits Spades <+ handOfSuits Clubs <+ handOfSuits Diamonds 
