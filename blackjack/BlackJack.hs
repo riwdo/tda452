@@ -86,9 +86,6 @@ winner guest bank = if((getValue guest) > (getValue bank)) then Guest else Bank
 (<+) (Add card1 hand1) Empty = empty
 (<+) (Add card1 hand1) hand2 = Add (Card (rank card1) (suit card1)) ((<+) hand1 hand2)
 
-
-listOfRanks = [Numeric 2,Numeric 3,Numeric 4,Numeric 5,Numeric 6,Numeric 7,Numeric 8,Numeric 9,Numeric 10,Jack,Queen,King,Ace]
-
 --mapsuits :: Rank -> Suit -> Hand
 --mapsuits r s = Add (Card r s)
 
@@ -98,4 +95,15 @@ handOfSuits s = Add (Card (Numeric 2) s) (Add (Card (Numeric 3) s) (Add (Card (N
                 (Add (Card (Numeric 10) s) (Add (Card Jack s) (Add (Card Queen s) (Add (Card King s) (Add (Card Ace s) empty))))))))))))
 
 fullDeck :: Hand
-fullDeck = handOfSuits Hearts <+ handOfSuits Spades <+ handOfSuits Clubs <+ handOfSuits Diamonds 
+fullDeck = handOfSuits Hearts <+ handOfSuits Spades <+ handOfSuits Clubs <+ handOfSuits Diamonds
+
+prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
+prop_onTopOf_assoc p1 p2 p3 =
+    p1<+(p2<+p3) == (p1<+p2)<+p3
+
+prop_size_onTopOf :: Hand -> Hand -> Bool
+prop_size_onTopOf p1 p2 = (size (p1<+p2)) == ((size p1) + (size p2))
+
+draw :: Hand -> Hand -> (Hand,Hand)
+draw Empty hand = error "draw: The deck is empty."
+draw (Add card deck) hand = ((Add (Card (rank card) (suit card)) hand),(deck))
