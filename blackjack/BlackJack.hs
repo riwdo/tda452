@@ -22,7 +22,7 @@ module BlackJack where
 import Cards
 import RunGame
 import System.Random
-import Test.QuickCheck
+import Test.QuickCheck hiding (shuffle)
 
 
 
@@ -65,6 +65,7 @@ getValue (Add card hand) = valueCard card + getValue hand
 
 
 value :: Hand -> Integer
+value Empty = 0
 value (Add card hand) | (getValue (Add card hand) > 21 && addAces (Add card hand) > 0) = ((getValue (Add card hand)) - (addAces (Add card hand) * 10))
                          | otherwise = getValue (Add card hand)
 
@@ -75,7 +76,10 @@ gameOver hand = getValue hand > 21
 
 -- winner decided with help from value if the bank or the guest has won.
 winner :: Hand -> Hand -> Player
-winner guest bank = if((getValue guest) > (getValue bank)) then Guest else Bank
+winner guest bank | (gameOver guest) = Bank
+                  | (gameOver bank) = Guest
+                  | (getValue guest) > (getValue bank) = Guest
+                  | otherwise = Bank
 
 
 
@@ -114,6 +118,60 @@ playBank deck = playBank' deck empty
 playBank' :: Hand -> Hand -> Hand
 playBank' deck Empty = playBank' deck' bankHand'
                       where (deck',bankHand') = draw deck Empty
-playBank' deck bankHand | (value bankHand' > 16) = bankHand
+playBank' deck bankHand | (value bankHand > 16) = bankHand
                         | otherwise = playBank' deck' bankHand'
                         where (deck',bankHand') = draw deck bankHand
+
+randomRank :: Integer -> Rank
+randomRank r | (r < 9) = (Numeric r)
+             | (r == 10) = Jack
+             | (r == 11) = Queen
+             | (r == 12) = King
+             | (r == 13) = Ace
+
+randomSuit :: Integer -> Suit
+randomSuit s | (s == 0) = Hearts
+             | (s == 1) = Clubs
+             | (s == 2) = Spades
+             | (s == 3) = Diamonds
+
+shuffle :: StdGen -> Hand -> Hand
+shuffle stdgen Empty = shuffle stdgen (Add (Card (randomRank r') (randomSuit s'))Empty)
+                      where (s', r') = randomSuitRank stdgen
+shuffle stdgen hand | (size (hand) == 52) = hand
+                    | otherwise = shuffle stdgen (Add (Card (randomRank rank') (randomSuit suit')) hand)
+                         where (suit', rank') = randomSuitRank stdgen
+
+removeCardDeck :: Hand -> Hand -> Suit -> Rank -> Hand
+--removeCardDeck empty (Add card hand) s r | (suit card == s && rank card == r) = hand
+--                                         | otherwise = removeCardDeck (Add (Card (rank card) (suit card))) hand
+removeCardDeck newHand Empty s r = newHand
+removeCardDeck newHand (Add card hand) s r |  ((rank card == r) && (suit card == s)) = removeCardDeck newHand hand s r
+                                           | otherwise = removeCardDeck ((Add (Card (rank card) (suit card))) newHand) hand s r
+
+randomSuitRank :: StdGen -> (Integer,Integer)
+randomSuitRank g = (n1, n2)
+  where (n1, g1) = randomR (0, 3) g
+        (n2, g2) = randomR (0, 12) g1
+
+prop_shuffle_sameCards :: StdGen -> Card -> Hand -> Bool
+prop_shuffle_sameCards g c h =
+            c `belongsTo` h == c `belongsTo` shuffle g h
+
+belongsTo :: Card -> Hand -> Bool
+c `belongsTo` Empty = False
+c `belongsTo` (Add c' h) = c == c' || c `belongsTo` h
+
+implementation = Interface
+  { iEmpty    = empty
+  , iFullDeck = fullDeck
+  , iValue    = value
+  , iGameOver = gameOver
+  , iWinner   = winner
+  , iDraw     = draw
+  , iPlayBank = playBank
+  , iShuffle  = shuffle
+  }
+
+main :: IO ()
+main = runGame implementation
