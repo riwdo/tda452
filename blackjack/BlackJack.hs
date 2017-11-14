@@ -21,7 +21,7 @@
 module BlackJack where
 import Cards
 import RunGame
-
+import System.Random
 import Test.QuickCheck
 
 
@@ -106,4 +106,14 @@ prop_size_onTopOf p1 p2 = (size (p1<+p2)) == ((size p1) + (size p2))
 
 draw :: Hand -> Hand -> (Hand,Hand)
 draw Empty hand = error "draw: The deck is empty."
-draw (Add card deck) hand = ((Add (Card (rank card) (suit card)) hand),(deck))
+draw (Add card deck) hand = ((deck),(Add (Card (rank card) (suit card)) hand))
+
+playBank :: Hand -> Hand
+playBank deck = playBank' deck empty
+
+playBank' :: Hand -> Hand -> Hand
+playBank' deck Empty = playBank' deck' bankHand'
+                      where (deck',bankHand') = draw deck Empty
+playBank' deck bankHand | (value bankHand' > 16) = bankHand
+                        | otherwise = playBank' deck' bankHand'
+                        where (deck',bankHand') = draw deck bankHand
