@@ -77,7 +77,7 @@ gameOver hand = getValue hand > 21
 -- winner decided with help from value if the bank or the guest has won.
 winner :: Hand -> Hand -> Player
 winner guest bank | (gameOver guest) = Bank
-                  | (gameOver bank) = Guest
+                  | (gameOver bank && (gameOver guest) == False) = Guest
                   | (getValue guest) > (getValue bank) = Guest
                   | otherwise = Bank
 
@@ -130,27 +130,9 @@ playBank' deck bankHand | (value bankHand > 16) = bankHand
                         | otherwise = playBank' deck' bankHand'
                         where (deck',bankHand') = draw deck bankHand
 
----converts a random number to a random rank
-randomRank :: Integer -> Rank
-randomRank r | (r < 9) = (Numeric r)
-             | (r == 10) = Jack
-             | (r == 11) = Queen
-             | (r == 12) = King
-             | (r == 13) = Ace
---- converts a random number to a random suit
-randomSuit :: Integer -> Suit
-randomSuit s | (s == 0) = Hearts
-             | (s == 1) = Clubs
-             | (s == 2) = Spades
-             | (s == 3) = Diamonds
-
 ---shuffles the deck by removing a random card from the deck and adding it to a new deck. Repeating this for each card.
 --- Probably not the best solution
 shuffle :: StdGen -> Hand -> Hand
---shuffle stdgen Empty = shuffle stdgen (Add (Card (randomRank r') (randomSuit s'))Empty)
---                      where (s', r') = randomSuitRank stdgen
---shuffle stdgen hand = shuffle stdgen (Add (Card (randomRank rank') (randomSuit suit')) hand)
-  --                       where (suit', rank') = randomSuitRank stdgen
 shuffle stdgen hand = shuffle' stdgen Empty hand
 
 shuffle' :: StdGen -> Hand -> Hand -> Hand
@@ -159,21 +141,15 @@ shuffle' stdgen newDeck oldDeck | (size newDeck == 52) = newDeck
                                 where (cardNumber, stdGen') = randomNumber stdgen ((size oldDeck)-1)
 
 removeCardDeck :: Hand -> Hand -> Integer -> Integer -> Hand
---removeCardDeck empty (Add card hand) s r | (suit card == s && rank card == r) = hand
---                                         | otherwise = removeCardDeck (Add (Card (rank card) (suit card))) hand
 removeCardDeck newHand Empty s r = newHand
 removeCardDeck newHand (Add card hand) s r |   (s == r) = removeCardDeck newHand hand (s+1) r
                                            | otherwise = removeCardDeck ((Add (Card (rank card) (suit card))) newHand) (hand) (s+1) r
 
 getCard :: Hand -> Integer -> Integer -> (Card)
---removeCardDeck empty (Add card hand) index 0 | (suit card == s && rank card == r) = hand
---                                         | otherwise = removeCardDeck (Add (Card (rank card) (suit card))) hand index
 getCard (Add card hand) 0 0 = card
 getCard (Add card hand) s r |  (s == r) = card
                             | otherwise = getCard hand (s+1) r
--- Random tal mellan 0 och antalet kort kvar i leken. Ta nummer r och lägg det överst
--- i den nya leken. Ta bort detta kort från den gamla leken och hämta ett nytt
--- random tal mellan 0 och antalet kort kvar.
+
 randomNumber :: StdGen -> Integer -> (Integer, StdGen)
 randomNumber g index = (n1, g1)
   where (n1, g1) = randomR (0, index) g
