@@ -83,38 +83,46 @@ winner guest bank | (gameOver guest) = Bank
 
 
 
------------------------Lab2B------------------------------
+-----------------------Lab2B-----------------------------
+---First if both hands are empty the new hand becomes empty.
+---If one of the hands are empty it adds cards from the non empty hand
+--- otherwise it puts the first on top of the second
 (<+) :: Hand -> Hand -> Hand
 (<+) Empty Empty = empty
 (<+) Empty (Add card2 hand2) = Add (Card (rank card2) (suit card2)) ((<+) Empty hand2)
 (<+) (Add card1 hand1) Empty = empty
 (<+) (Add card1 hand1) hand2 = Add (Card (rank card1) (suit card1)) ((<+) hand1 hand2)
 
---mapsuits :: Rank -> Suit -> Hand
---mapsuits r s = Add (Card r s)
-
+--- all the ranks
 handOfSuits :: Suit -> Hand
 handOfSuits s = Add (Card (Numeric 2) s) (Add (Card (Numeric 3) s) (Add (Card (Numeric 4) s)(Add (Card (Numeric 5) s)
                 (Add (Card (Numeric 6) s)(Add (Card (Numeric 7) s)(Add (Card (Numeric 8) s)(Add (Card (Numeric 9) s)
                 (Add (Card (Numeric 10) s) (Add (Card Jack s) (Add (Card Queen s) (Add (Card King s) (Add (Card Ace s) empty))))))))))))
 
+---utilises handofsuits and <+ to build a deck with all the different cards
 fullDeck :: Hand
 fullDeck = handOfSuits Hearts <+ handOfSuits Spades <+ handOfSuits Clubs <+ handOfSuits Diamonds
 
+---associative test
 prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
 prop_onTopOf_assoc p1 p2 p3 =
     p1<+(p2<+p3) == (p1<+p2)<+p3
 
+---size test
 prop_size_onTopOf :: Hand -> Hand -> Bool
 prop_size_onTopOf p1 p2 = (size (p1<+p2)) == ((size p1) + (size p2))
 
+---if the deck is empty it cannot draw a card
+---otherwise it draws the top card of the deck adds it to the hand and returns them
 draw :: Hand -> Hand -> (Hand,Hand)
 draw Empty hand = error "draw: The deck is empty."
 draw (Add card deck) hand = ((deck),(Add (Card (rank card) (suit card)) hand))
 
+---relies on the playBank' function to play as the Bank
 playBank :: Hand -> Hand
 playBank deck = playBank' deck empty
 
+--- draws cards for the Bank from the deck if the bank has not yet reached 16 or more of score
 playBank' :: Hand -> Hand -> Hand
 playBank' deck Empty = playBank' deck' bankHand'
                       where (deck',bankHand') = draw deck Empty
@@ -122,19 +130,22 @@ playBank' deck bankHand | (value bankHand > 16) = bankHand
                         | otherwise = playBank' deck' bankHand'
                         where (deck',bankHand') = draw deck bankHand
 
+---converts a random number to a random rank
 randomRank :: Integer -> Rank
 randomRank r | (r < 9) = (Numeric r)
              | (r == 10) = Jack
              | (r == 11) = Queen
              | (r == 12) = King
              | (r == 13) = Ace
-
+--- converts a random number to a random suit
 randomSuit :: Integer -> Suit
 randomSuit s | (s == 0) = Hearts
              | (s == 1) = Clubs
              | (s == 2) = Spades
              | (s == 3) = Diamonds
 
+---shuffles the deck by removing a random card from the deck and adding it to a new deck. Repeating this for each card.
+--- Probably not the best solution
 shuffle :: StdGen -> Hand -> Hand
 --shuffle stdgen Empty = shuffle stdgen (Add (Card (randomRank r') (randomSuit s'))Empty)
 --                      where (s', r') = randomSuitRank stdgen
@@ -167,10 +178,12 @@ randomNumber :: StdGen -> Integer -> (Integer, StdGen)
 randomNumber g index = (n1, g1)
   where (n1, g1) = randomR (0, index) g
 
+---test for same cards in the original deck and the shuffled deck
 prop_shuffle_sameCards :: StdGen -> Card -> Hand -> Bool
 prop_shuffle_sameCards g c h =
               c `belongsTo` h == c `belongsTo` shuffle g h
 
+---help function for prop_shuffle_sameCards that checks if a card belongs in a deck or not
 belongsTo :: Card -> Hand -> Bool
 c `belongsTo` Empty = False
 c `belongsTo` (Add c' h) = c == c' || c `belongsTo` h
