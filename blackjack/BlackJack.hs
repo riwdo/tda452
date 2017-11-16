@@ -136,42 +136,55 @@ randomSuit s | (s == 0) = Hearts
              | (s == 3) = Diamonds
 
 shuffle :: StdGen -> Hand -> Hand
-shuffle stdgen Empty = shuffle stdgen (Add (Card (randomRank r') (randomSuit s'))Empty)
-                      where (s', r') = randomSuitRank stdgen
-shuffle stdgen hand | (size (hand) == 52) = hand
-                    | otherwise = shuffle stdgen (Add (Card (randomRank rank') (randomSuit suit')) hand)
-                         where (suit', rank') = randomSuitRank stdgen
+--shuffle stdgen Empty = shuffle stdgen (Add (Card (randomRank r') (randomSuit s'))Empty)
+--                      where (s', r') = randomSuitRank stdgen
+--shuffle stdgen hand = shuffle stdgen (Add (Card (randomRank rank') (randomSuit suit')) hand)
+  --                       where (suit', rank') = randomSuitRank stdgen
+shuffle stdgen hand = shuffle' stdgen Empty hand
 
-removeCardDeck :: Hand -> Hand -> Suit -> Rank -> Hand
+shuffle' :: StdGen -> Hand -> Hand -> Hand
+shuffle' stdgen newDeck oldDeck | (size newDeck == 52) = newDeck
+                                | otherwise = shuffle' stdGen' ((Add (getCard oldDeck 0 cardNumber)) newDeck) (removeCardDeck Empty oldDeck 0 cardNumber)
+                                where (cardNumber, stdGen') = randomNumber stdgen ((size oldDeck)-1)
+
+removeCardDeck :: Hand -> Hand -> Integer -> Integer -> Hand
 --removeCardDeck empty (Add card hand) s r | (suit card == s && rank card == r) = hand
 --                                         | otherwise = removeCardDeck (Add (Card (rank card) (suit card))) hand
 removeCardDeck newHand Empty s r = newHand
-removeCardDeck newHand (Add card hand) s r |  ((rank card == r) && (suit card == s)) = removeCardDeck newHand hand s r
-                                           | otherwise = removeCardDeck ((Add (Card (rank card) (suit card))) newHand) hand s r
+removeCardDeck newHand (Add card hand) s r |   (s == r) = removeCardDeck newHand hand (s+1) r
+                                           | otherwise = removeCardDeck ((Add (Card (rank card) (suit card))) newHand) (hand) (s+1) r
 
-randomSuitRank :: StdGen -> (Integer,Integer)
-randomSuitRank g = (n1, n2)
-  where (n1, g1) = randomR (0, 3) g
-        (n2, g2) = randomR (0, 12) g1
+getCard :: Hand -> Integer -> Integer -> (Card)
+--removeCardDeck empty (Add card hand) index 0 | (suit card == s && rank card == r) = hand
+--                                         | otherwise = removeCardDeck (Add (Card (rank card) (suit card))) hand index
+getCard (Add card hand) 0 0 = card
+getCard (Add card hand) s r |  (s == r) = card
+                            | otherwise = getCard hand (s+1) r
+-- Random tal mellan 0 och antalet kort kvar i leken. Ta nummer r och lägg det överst
+-- i den nya leken. Ta bort detta kort från den gamla leken och hämta ett nytt
+-- random tal mellan 0 och antalet kort kvar.
+randomNumber :: StdGen -> Integer -> (Integer, StdGen)
+randomNumber g index = (n1, g1)
+  where (n1, g1) = randomR (0, index) g
 
 prop_shuffle_sameCards :: StdGen -> Card -> Hand -> Bool
 prop_shuffle_sameCards g c h =
-            c `belongsTo` h == c `belongsTo` shuffle g h
+              c `belongsTo` h == c `belongsTo` shuffle g h
 
 belongsTo :: Card -> Hand -> Bool
 c `belongsTo` Empty = False
 c `belongsTo` (Add c' h) = c == c' || c `belongsTo` h
 
 implementation = Interface
-  { iEmpty    = empty
-  , iFullDeck = fullDeck
-  , iValue    = value
-  , iGameOver = gameOver
-  , iWinner   = winner
-  , iDraw     = draw
-  , iPlayBank = playBank
-  , iShuffle  = shuffle
-  }
+    { iEmpty    = empty
+    , iFullDeck = fullDeck
+    , iValue    = value
+    , iGameOver = gameOver
+    , iWinner   = winner
+    , iDraw     = draw
+    , iPlayBank = playBank
+    , iShuffle  = shuffle
+    }
 
 main :: IO ()
 main = runGame implementation
