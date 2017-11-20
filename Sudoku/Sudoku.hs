@@ -35,7 +35,16 @@ allBlankSudoku = Sudoku (replicate 9 (replicate 9 Nothing))
 -- | isSudoku sud checks if sud is really a valid representation of a sudoku
 -- puzzle
 isSudoku :: Sudoku -> Bool
-isSudoku = undefined
+isSudoku (Sudoku sudoku) = length (sudoku) == 9
+
+row' :: [[Maybe Int]] -> Bool
+row' (x:xs) = element' x && row' xs
+
+element' :: [Maybe Int] -> Bool
+element' (x:xs) | x > (Just 0) && x < (Just 10) = True
+                | x == Nothing = True
+                | otherwise = False
+
 
 -- * A3
 
