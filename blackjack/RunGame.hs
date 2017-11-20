@@ -31,6 +31,7 @@ runGame i =
 gameLoop :: Interface -> Hand -> Hand -> IO ()
 gameLoop i deck guest =
   do putStrLn ("Your current score: " ++ show (iValue i guest))
+     putStrLn ("Hand: " ++ show (guest))
      if iGameOver i guest
        then finish i deck guest
        else do putStrLn "Draw another card? [y]"
@@ -43,7 +44,8 @@ gameLoop i deck guest =
 -- | Display the bank's final score and the winner.
 finish :: Interface -> Hand -> Hand -> IO ()
 finish i deck guest =
-  do putStrLn ("The bank's final score: " ++ show (iValue i bank))
+  do putStrLn ("The guest's final score: " ++ show (iValue i guest))
+     putStrLn ("The bank's final score: " ++ show (iValue i bank))
      putStrLn ("Winner: " ++ show (iWinner i guest bank))
   where
     bank = iPlayBank i deck

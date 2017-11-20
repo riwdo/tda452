@@ -52,7 +52,7 @@ valueCard card = valueRank (rank card)
 
 addAces :: Hand -> Integer
 addAces Empty = 0
-addAces (Add card hand) = if((rank card) == Ace) then 1 + addAces hand else 0 + addAces hand
+addAces (Add card hand) = if rank card == Ace then 1 + addAces hand else 0 + addAces hand
 
 
 -- if the hand is empty the value is 0 otherwise it itterates through all cards in the hand and adds their value to the value of the hand
@@ -66,7 +66,7 @@ getValue (Add card hand) = valueCard card + getValue hand
 
 value :: Hand -> Integer
 value Empty = 0
-value (Add card hand) | (getValue (Add card hand) > 21 && addAces (Add card hand) > 0) = ((getValue (Add card hand)) - (addAces (Add card hand) * 10))
+value (Add card hand) | getValue (Add card hand) > 21 && addAces (Add card hand) > 0 = getValue (Add card hand) - addAces (Add card hand) * 10
                          | otherwise = getValue (Add card hand)
 
 
@@ -76,9 +76,9 @@ gameOver hand = getValue hand > 21
 
 -- winner decided with help from value if the bank or the guest has won.
 winner :: Hand -> Hand -> Player
-winner guest bank | (gameOver guest) = Bank
-                  | (gameOver bank && (gameOver guest) == False) = Guest
-                  | (getValue guest) > (getValue bank) = Guest
+winner guest bank | gameOver guest = Bank
+                  | gameOver bank && gameOver guest == False = Guest
+                  | getValue guest > getValue bank = Guest
                   | otherwise = Bank
 
 
@@ -86,12 +86,11 @@ winner guest bank | (gameOver guest) = Bank
 -----------------------Lab2B-----------------------------
 ---First if both hands are empty the new hand becomes empty.
 ---If one of the hands are empty it adds cards from the non empty hand
---- otherwise it puts the first on top of the second
+--- otherwise it puts the first on top of the recursive call of the two hands
 (<+) :: Hand -> Hand -> Hand
 (<+) Empty Empty = empty
-(<+) Empty (Add card2 hand2) = Add (Card (rank card2) (suit card2)) ((<+) Empty hand2)
-(<+) (Add card1 hand1) Empty = empty
-(<+) (Add card1 hand1) hand2 = Add (Card (rank card1) (suit card1)) ((<+) hand1 hand2)
+(<+) Empty (Add card2 hand2) = Add (card2) (Empty <+ hand2)
+(<+) (Add card1 hand1) hand2 = Add (card1) (hand1<+hand2)
 
 --- all the ranks
 handOfSuits :: Suit -> Hand
@@ -110,13 +109,13 @@ prop_onTopOf_assoc p1 p2 p3 =
 
 ---size test
 prop_size_onTopOf :: Hand -> Hand -> Bool
-prop_size_onTopOf p1 p2 = (size (p1<+p2)) == ((size p1) + (size p2))
+prop_size_onTopOf p1 p2 = size (p1<+p2) == size p1 + size p2
 
 ---if the deck is empty it cannot draw a card
 ---otherwise it draws the top card of the deck adds it to the hand and returns them
 draw :: Hand -> Hand -> (Hand,Hand)
 draw Empty hand = error "draw: The deck is empty."
-draw (Add card deck) hand = ((deck),(Add (Card (rank card) (suit card)) hand))
+draw (Add card deck) hand = (deck,Add (Card (rank card) (suit card)) hand)
 
 ---relies on the playBank' function to play as the Bank
 playBank :: Hand -> Hand
@@ -126,30 +125,30 @@ playBank deck = playBank' deck empty
 playBank' :: Hand -> Hand -> Hand
 playBank' deck Empty = playBank' deck' bankHand'
                       where (deck',bankHand') = draw deck Empty
-playBank' deck bankHand | (value bankHand > 16) = bankHand
+playBank' deck bankHand | value bankHand > 16 = bankHand
                         | otherwise = playBank' deck' bankHand'
                         where (deck',bankHand') = draw deck bankHand
 
 ---shuffles the deck by removing a random card from the deck and adding it to a new deck. Repeating this for each card.
---- Probably not the best solution
 shuffle :: StdGen -> Hand -> Hand
 shuffle stdgen hand = shuffle' stdgen Empty hand
 
+--helperfunction that shuffles until the newDeck is of size 52.
 shuffle' :: StdGen -> Hand -> Hand -> Hand
-shuffle' stdgen newDeck oldDeck | (size newDeck == 52) = newDeck
-                                | otherwise = shuffle' stdGen' ((Add (getCard oldDeck 0 cardNumber)) newDeck) (removeCardDeck Empty oldDeck 0 cardNumber)
-                                where (cardNumber, stdGen') = randomNumber stdgen ((size oldDeck)-1)
-
+shuffle' stdgen newDeck oldDeck | size newDeck == 52 = newDeck
+                                | otherwise = shuffle' stdGen' (Add (getCard oldDeck 0 cardNumber) newDeck) (removeCardDeck Empty oldDeck 0 cardNumber)
+                                where (cardNumber, stdGen') = randomNumber stdgen (size oldDeck-1)
+--Search through the hand and remove the randomised card and return the new hand.
 removeCardDeck :: Hand -> Hand -> Integer -> Integer -> Hand
-removeCardDeck newHand Empty s r = newHand
-removeCardDeck newHand (Add card hand) s r |   (s == r) = removeCardDeck newHand hand (s+1) r
-                                           | otherwise = removeCardDeck ((Add (Card (rank card) (suit card))) newHand) (hand) (s+1) r
-
+removeCardDeck newHand Empty currentIndex randomIndex = newHand
+removeCardDeck newHand (Add card hand) currentIndex randomIndex |   currentIndex == randomIndex = removeCardDeck newHand hand (currentIndex+1) randomIndex
+                                           | otherwise = removeCardDeck (Add (Card (rank card) (suit card)) newHand) hand (currentIndex+1) randomIndex
+--Get the random card given a random index
 getCard :: Hand -> Integer -> Integer -> (Card)
 getCard (Add card hand) 0 0 = card
-getCard (Add card hand) s r |  (s == r) = card
-                            | otherwise = getCard hand (s+1) r
-
+getCard (Add card hand) currentIndex randomIndex |  currentIndex == randomIndex = card
+                            | otherwise = getCard hand (currentIndex+1) randomIndex
+--return new seed and random number between 0 and given index
 randomNumber :: StdGen -> Integer -> (Integer, StdGen)
 randomNumber g index = (n1, g1)
   where (n1, g1) = randomR (0, index) g
