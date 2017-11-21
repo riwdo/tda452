@@ -10,7 +10,7 @@ data Sudoku = Sudoku { rows :: [[Maybe Int]] }
 example :: Sudoku
 example =
     Sudoku
-      [ [j 3,j 6,n  ,n  ,j 7,j 1,j 2,n  ,n  ]
+      [ [j 9,j 6,n  ,n  ,j 7,j 1,j 2,n  ,n  ]
       , [n  ,j 5,n  ,n  ,n  ,n  ,j 1,j 8,n  ]
       , [n  ,n  ,j 9,j 2,n  ,j 4,j 7,n  ,n  ]
       , [n  ,n  ,n  ,n  ,j 1,j 3,n  ,j 2,j 8]
@@ -24,6 +24,23 @@ example =
     n = Nothing
     j = Just
 
+example2 :: Sudoku
+example2 =
+        Sudoku
+          [ [j 9,j 6,j 1  ,j 1  ,j 7,j 1,j 2,j 1  ,j 1  ]
+          , [n  ,j 5,n  ,n  ,n  ,n  ,j 1,j 8,n  ]
+          , [n  ,n  ,j 9,j 2,n  ,j 4,j 7,n  ,n  ]
+          , [n  ,n  ,n  ,n  ,j 1,j 3,n  ,j 2,j 8]
+          , [j 4,n  ,n  ,j 5,n  ,j 2,n  ,n  ,j 9]
+          , [j 2,j 7,n  ,j 4,j 6,n  ,n  ,n  ,n  ]
+          , [n  ,n  ,j 5,j 3,n  ,j 8,j 9,n  ,n  ]
+          , [n  ,j 8,j 3,n  ,n  ,n  ,n  ,j 6,n  ]
+          , [n  ,n  ,j 7,j 6,j 9,n  ,n  ,j 4,j 3]
+          ]
+      where
+        n = Nothing
+        j = Just
+
 -- * A1
 
 -- | allBlankSudoku is a sudoku with just blanks
@@ -35,14 +52,14 @@ allBlankSudoku = Sudoku (replicate 9 (replicate 9 Nothing))
 -- | isSudoku sud checks if sud is really a valid representation of a sudoku
 -- puzzle
 isSudoku :: Sudoku -> Bool
-isSudoku (Sudoku sudoku) = length (sudoku) == 9
+isSudoku (Sudoku sudoku) = length (sudoku) == 9 && row' sudoku
 
 row' :: [[Maybe Int]] -> Bool
-row' (x:xs) = element' x && row' xs
+row' (x:xs) = element' x && length x == 9
 
 element' :: [Maybe Int] -> Bool
-element' (x:xs) | x > (Just 0) && x < (Just 10) = True
-                | x == Nothing = True
+element' (x:xs) | x > (Just 0) && x < (Just 10) = True && element' xs
+                | x == Nothing = True && element' xs
                 | otherwise = False
 
 
@@ -51,7 +68,15 @@ element' (x:xs) | x > (Just 0) && x < (Just 10) = True
 -- | isFilled sud checks if sud is completely filled in,
 -- i.e. there are no blanks
 isFilled :: Sudoku -> Bool
-isFilled = undefined
+isFilled (Sudoku sudoku) = length (sudoku) == 9 && rowsplz sudoku
+
+rowsplz :: [[Maybe Int]] -> Bool
+rowsplz (x:xs) = elementplz x && length x == 9
+
+elementplz :: [Maybe Int] -> Bool
+elementplz [x] = error "fuck boi"
+elementplz (x:xs) | x > (Just 0) && x < (Just 10) = True && elementplz (tail xs)
+                | otherwise = False
 
 -------------------------------------------------------------------------
 
