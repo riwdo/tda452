@@ -27,7 +27,7 @@ example =
 example2 :: Sudoku
 example2 =
         Sudoku
-          [ [j 9,j 6,j 1  ,j 1  ,j 7,j 1,j 2,j 1  ,j 1  ]
+          [ [j 9,j 6,j 1,j 1,j 7,j 1,j 2,j 1,j 1]
           , [n  ,j 5,n  ,n  ,n  ,n  ,j 1,j 8,n  ]
           , [n  ,n  ,j 9,j 2,n  ,j 4,j 7,n  ,n  ]
           , [n  ,n  ,n  ,n  ,j 1,j 3,n  ,j 2,j 8]
@@ -54,6 +54,7 @@ allBlankSudoku = Sudoku (replicate 9 (replicate 9 Nothing))
 isSudoku :: Sudoku -> Bool
 isSudoku (Sudoku sudoku) = length (sudoku) == 9 && row' sudoku
 
+
 row' :: [[Maybe Int]] -> Bool
 row' (x:xs) = element' x && length x == 9
 
@@ -71,12 +72,11 @@ isFilled :: Sudoku -> Bool
 isFilled (Sudoku sudoku) = length (sudoku) == 9 && rowsplz sudoku
 
 rowsplz :: [[Maybe Int]] -> Bool
-rowsplz [[]] = True
-rowsplz (x:xs) = elementplz x && length x == 9 && rowsplz xs
+rowsplz (x:xs) = elementplz x && length x == 9
 
 elementplz :: [Maybe Int] -> Bool
-elementplz [] = True
-elementplz (x:xs) | x > (Just 0) && x < (Just 10) = True && elementplz xs
+elementplz [x] = error "fuck boi"
+elementplz (x:xs) | x > (Just 0) && x < (Just 10) = True && elementplz (tail xs)
                 | otherwise = False
 
 -------------------------------------------------------------------------
@@ -86,8 +86,18 @@ elementplz (x:xs) | x > (Just 0) && x < (Just 10) = True && elementplz xs
 -- |b printSudoku sud prints a nice representation of the sudoku sud on
 -- the screen
 printSudoku :: Sudoku -> IO ()
-printSudoku = undefined
+printSudoku (Sudoku sudoku) = do putStrLn(formatSudoku sudoku)
 
+formatSudoku :: [[Maybe Int]] -> String
+formatSudoku [] = ""
+formatSudoku (x:xs) = getElement x ++  "\n" ++ formatSudoku xs
+
+getElement :: [Maybe Int] -> String
+getElement [] = ""
+getElement (x:xs) | x > (j 0) && x < (j 10) = case x of Just x -> show x ++ getElement xs
+                  | x == n = "." ++ getElement xs
+                  where n = Nothing
+                        j = Just
 -- * B2
 
 -- | readSudoku file reads from the file, and either delivers it, or stops
