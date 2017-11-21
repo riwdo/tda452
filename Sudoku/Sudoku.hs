@@ -71,11 +71,12 @@ isFilled :: Sudoku -> Bool
 isFilled (Sudoku sudoku) = length (sudoku) == 9 && rowsplz sudoku
 
 rowsplz :: [[Maybe Int]] -> Bool
-rowsplz (x:xs) = elementplz x && length x == 9
+rowsplz [[]] = True
+rowsplz (x:xs) = elementplz x && length x == 9 && rowsplz xs
 
 elementplz :: [Maybe Int] -> Bool
-elementplz [x] = error "fuck boi"
-elementplz (x:xs) | x > (Just 0) && x < (Just 10) = True && elementplz (tail xs)
+elementplz [] = True
+elementplz (x:xs) | x > (Just 0) && x < (Just 10) = True && elementplz xs
                 | otherwise = False
 
 -------------------------------------------------------------------------
