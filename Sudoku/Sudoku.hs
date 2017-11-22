@@ -40,7 +40,7 @@ example2 =
           ]
       where
         j = Just
-
+------------Lab 3A---------------------------------------------------
 -- * A1
 
 -- | allBlankSudoku is a sudoku with just blanks
