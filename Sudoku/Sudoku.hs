@@ -105,15 +105,27 @@ getElement (x:xs) | x > (j 0) && x < (j 10) = case x of Just x -> show x ++ getE
 
 -- | readSudoku file reads from the file, and either delivers it, or stops
 -- if the file did not contain a sudoku
---readSudoku :: FilePath -> IO Sudoku
---readSudoku path = do
---      content <- readFile path
---      checkContent content
+readSudoku :: FilePath -> IO Sudoku
+readSudoku path = do
+      content <- readFile path
+      checkContent (Sudoku (map parseRows (lines content)))
 
---checkContent :: Sudoku -> IO Sudoku
---checkContent sudoku
---          | isSudoku sudoku = return sudoku
---          | otherwise = putStrLn("no sudoku here")
+--Checks so that content that has been parsed is actually a sudoku
+checkContent :: Sudoku -> IO Sudoku
+checkContent sudoku
+          | isSudoku sudoku = return sudoku
+          | otherwise = "no sudoku here"
+
+--maps the rows and parses each element
+parseRows :: String -> [Maybe Int]
+parseRows = map parseElements
+
+--Checks if an element from the file is valid
+parseElements :: Char -> Maybe Int
+parseElements '.' = Nothing
+parseElements x
+              | isDigit x = Just (digitToInt x)
+              | otherwise = error "This does not belong here"
 
 -------------------------------------------------------------------------
 
