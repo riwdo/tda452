@@ -1,5 +1,6 @@
 import Test.QuickCheck
 
+
 -------------------------------------------------------------------------
 
 -- | Representation of sudoku puzzlese (allows some junk)
@@ -130,8 +131,8 @@ parseElements x
 
 -- | cell generates an arbitrary cell in a Sudoku
 cell :: Gen (Maybe Int)
-cell = undefined
-
+cell = do n <- arbitrary
+          return (n)
 
 -- * C2
 
