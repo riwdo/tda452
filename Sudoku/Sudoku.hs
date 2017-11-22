@@ -106,7 +106,7 @@ getElement (x:xs) | x > (j 0) && x < (j 10) = case x of Just x -> show x ++ getE
 readSudoku :: FilePath -> IO Sudoku
 readSudoku path = do
       content <- readFile path
-      checkContent content (map parseRows (lines content))
+      checkContent (Sudoku (map parseRows (lines content)))
 
 --Checks so that content that has been parsed is actually a sudoku
 checkContent :: Sudoku -> IO Sudoku
