@@ -1,5 +1,5 @@
 import Test.QuickCheck
-
+import Data.Char
 
 -------------------------------------------------------------------------
 
@@ -114,7 +114,7 @@ readSudoku path = do
 checkContent :: Sudoku -> IO Sudoku
 checkContent sudoku
           | isSudoku sudoku = return sudoku
-          | otherwise = "no sudoku here"
+          | otherwise = error "no sudoku here"
 
 --maps the rows and parses each element
 parseRows :: String -> [Maybe Int]
@@ -133,8 +133,7 @@ parseElements x
 
 -- | cell generates an arbitrary cell in a Sudoku
 cell :: Gen (Maybe Int)
-cell = do n <- arbitrary
-          return (n)
+cell = frequency [(1,return (Just 1)), (1,return (Just 2)), (1,return (Just 3)), (1,return (Just 4)), (1,return (Just 5)), (1,return (Just 6)), (1,return (Just 7)), (1,return (Just 8)), (1,return (Just 9)), (9, return (Nothing))]
 
 -- * C2
 
