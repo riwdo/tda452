@@ -133,8 +133,7 @@ parseElements x
 
 -- | cell generates an arbitrary cell in a Sudoku
 cell :: Gen (Maybe Int)
-cell = do n <- arbitrary
-          return (n)
+cell = frequency [(1,return (Just 1)), (1,return (Just 2)), (1,return (Just 3)), (1,return (Just 4)), (1,return (Just 5)), (1,return (Just 6)), (1,return (Just 7)), (1,return (Just 8)), (1,return (Just 9)), (9, return (Nothing))]
 
 -- * C2
 
