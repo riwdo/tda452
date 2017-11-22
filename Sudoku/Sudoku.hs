@@ -145,3 +145,25 @@ instance Arbitrary Sudoku where
        return (Sudoku rows)
 
 -------------------------------------------------------------------------
+
+-- * D1
+
+type Block = [Maybe Int]
+
+--Checks that a 3x3 block does not contain the same digit twice
+-- if its nothing it continues with checking
+-- otherwise it checks each element against every other elementin the list
+isOkayBlock :: Block -> Bool
+isOkayBlock [] = True
+isOkayBlock (Nothing:xs) = isOkayBlock xs
+isOkayBlock (x:xs) = (notElem x xs) && isOkayBlock xs
+
+-- * D2
+
+blocks :: Sudoku -> Block
+blocks = undefined
+
+-- * D3
+
+isOkay :: Sudoku -> Bool
+isOkay = undefined
