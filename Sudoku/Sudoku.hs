@@ -159,7 +159,7 @@ isOkayBlock (x:xs) = (notElem x xs) && isOkayBlock xs
 
 -- * D2
 
-blocks :: Sudoku -> Block
+blocks :: Sudoku -> [Block]
 blocks = undefined
 
 -- * D3
