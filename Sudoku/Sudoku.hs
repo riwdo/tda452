@@ -29,17 +29,16 @@ example2 :: Sudoku
 example2 =
         Sudoku
           [ [j 9,j 6,j 1,j 1,j 7,j 1,j 2,j 1,j 1]
-          , [n  ,j 5,n  ,n  ,n  ,n  ,j 1,j 8,n  ]
-          , [n  ,n  ,j 9,j 2,n  ,j 4,j 7,n  ,n  ]
-          , [n  ,n  ,n  ,n  ,j 1,j 3,n  ,j 2,j 8]
-          , [j 4,n  ,n  ,j 5,n  ,j 2,n  ,n  ,j 9]
-          , [j 2,j 7,n  ,j 4,j 6,n  ,n  ,n  ,n  ]
-          , [n  ,n  ,j 5,j 3,n  ,j 8,j 9,n  ,n  ]
-          , [n  ,j 8,j 3,n  ,n  ,n  ,n  ,j 6,n  ]
-          , [n  ,n  ,j 7,j 6,j 9,n  ,n  ,j 4,j 3]
+          , [j 9,j 6,j 1,j 1,j 7,j 1,j 2,j 1,j 1]
+          , [j 9,j 6,j 1,j 1,j 7,j 1,j 2,j 1,j 1]
+          , [j 9,j 6,j 1,j 1,j 7,j 1,j 2,j 1,j 1]
+          , [j 9,j 6,j 1,j 1,j 7,j 1,j 2,j 1,j 1]
+          , [j 9,j 6,j 1,j 1,j 7,j 1,j 2,j 1,j 1]
+          , [j 9,j 6,j 1,j 1,j 7,j 1,j 2,j 1,j 1]
+          , [j 9,j 6,j 1,j 1,j 7,j 1,j 2,j 1,j 1]
+          , [j 9,j 6,j 1,j 1,j 7,j 1,j 2,j 1,j 1]
           ]
       where
-        n = Nothing
         j = Just
 
 -- * A1
@@ -57,9 +56,11 @@ isSudoku (Sudoku sudoku) = length (sudoku) == 9 && row' sudoku
 
 
 row' :: [[Maybe Int]] -> Bool
-row' (x:xs) = element' x && length x == 9
+row' [] = True
+row' (x:xs) = element' x && length x == 9 && row' xs
 
 element' :: [Maybe Int] -> Bool
+element' [] = True
 element' (x:xs) | x > (Just 0) && x < (Just 10) = True && element' xs
                 | x == Nothing = True && element' xs
                 | otherwise = False
@@ -73,12 +74,13 @@ isFilled :: Sudoku -> Bool
 isFilled (Sudoku sudoku) = length (sudoku) == 9 && checkRows sudoku
 
 checkRows :: [[Maybe Int]] -> Bool
-checkRows (x:xs) = checkElement x && length x == 9
+checkRows [] = True
+checkRows (x:xs) = checkElement x && (length x == 9) && checkRows xs
 
 checkElement :: [Maybe Int] -> Bool
-checkElement [x] = error "element be empty"
-checkElement (x:xs) | x > (Just 0) && x < (Just 10) = True && checkElement (tail xs)
-                | otherwise = False
+checkElement [] = True
+checkElement (x:xs) | x > (Just 0) && x < (Just 10) = True && checkElement xs
+                    | otherwise = False
 
 -------------------------------------------------------------------------
 
@@ -103,15 +105,15 @@ getElement (x:xs) | x > (j 0) && x < (j 10) = case x of Just x -> show x ++ getE
 
 -- | readSudoku file reads from the file, and either delivers it, or stops
 -- if the file did not contain a sudoku
-readSudoku :: FilePath -> IO Sudoku
-readSudoku path = do
-      content <- readFile path
-      checkContent content
+--readSudoku :: FilePath -> IO Sudoku
+--readSudoku path = do
+--      content <- readFile path
+--      checkContent content
 
-checkContent :: Sudoku -> IO Sudoku
-checkContent sudoku
-          | isSudoku sudoku = return sudoku
-          | otherwise = "no sudoku here"
+--checkContent :: Sudoku -> IO Sudoku
+--checkContent sudoku
+--          | isSudoku sudoku = return sudoku
+--          | otherwise = putStrLn("no sudoku here")
 
 -------------------------------------------------------------------------
 
