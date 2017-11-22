@@ -70,14 +70,14 @@ element' (x:xs) | x > (Just 0) && x < (Just 10) = True && element' xs
 -- | isFilled sud checks if sud is completely filled in,
 -- i.e. there are no blanks
 isFilled :: Sudoku -> Bool
-isFilled (Sudoku sudoku) = length (sudoku) == 9 && rowsplz sudoku
+isFilled (Sudoku sudoku) = length (sudoku) == 9 && checkRows sudoku
 
-rowsplz :: [[Maybe Int]] -> Bool
-rowsplz (x:xs) = elementplz x && length x == 9
+checkRows :: [[Maybe Int]] -> Bool
+checkRows (x:xs) = checkElement x && length x == 9
 
-elementplz :: [Maybe Int] -> Bool
-elementplz [x] = error "fuck boi"
-elementplz (x:xs) | x > (Just 0) && x < (Just 10) = True && elementplz (tail xs)
+checkElement :: [Maybe Int] -> Bool
+checkElement [x] = error "element be empty"
+checkElement (x:xs) | x > (Just 0) && x < (Just 10) = True && checkElement (tail xs)
                 | otherwise = False
 
 -------------------------------------------------------------------------
@@ -104,7 +104,14 @@ getElement (x:xs) | x > (j 0) && x < (j 10) = case x of Just x -> show x ++ getE
 -- | readSudoku file reads from the file, and either delivers it, or stops
 -- if the file did not contain a sudoku
 readSudoku :: FilePath -> IO Sudoku
-readSudoku = undefined
+readSudoku path = do
+      content <- readFile path
+      checkContent content
+
+checkContent :: Sudoku -> IO Sudoku
+checkContent sudoku
+          | isSudoku sudoku = return sudoku
+          | otherwise = "no sudoku here"
 
 -------------------------------------------------------------------------
 
