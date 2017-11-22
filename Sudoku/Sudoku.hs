@@ -1,5 +1,5 @@
 import Test.QuickCheck
-
+import Data.Char
 
 -------------------------------------------------------------------------
 
@@ -114,7 +114,7 @@ readSudoku path = do
 checkContent :: Sudoku -> IO Sudoku
 checkContent sudoku
           | isSudoku sudoku = return sudoku
-          | otherwise = "no sudoku here"
+          | otherwise = error "no sudoku here"
 
 --maps the rows and parses each element
 parseRows :: String -> [Maybe Int]
