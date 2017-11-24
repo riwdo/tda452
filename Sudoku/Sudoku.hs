@@ -143,4 +143,8 @@ instance Arbitrary Sudoku where
     do rows <- vectorOf 9 (vectorOf 9 cell)
        return (Sudoku rows)
 
+-- * C3
+prop_Sudoku :: Sudoku -> Bool
+prop_Sudoku (Sudoku sudoku) = isSudoku (Sudoku sudoku)
+
 -------------------------------------------------------------------------
