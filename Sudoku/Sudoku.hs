@@ -175,6 +175,9 @@ cols' :: [[a]] -> [[a]]
 cols' [] = []
 cols' x = (concat (take 3 x)) : cols' (drop 3 x)
 
+prop_blocks :: Sudoku -> Bool
+prop_blocks = undefined
+
 -- * D3
 
 isOkay :: Sudoku -> Bool
