@@ -1,5 +1,6 @@
 import Test.QuickCheck
 import Data.Char
+import Data.List
 
 -------------------------------------------------------------------------
 
@@ -165,6 +166,14 @@ isOkayBlock (x:xs) = (notElem x xs) && isOkayBlock xs
 
 blocks :: Sudoku -> [Block]
 blocks = undefined
+
+rows' :: [[a]] -> [[a]]
+rows' [] = []
+rows' x = cols' (transpose (take 3 x)) ++ rows' (drop 3 x)
+
+cols' :: [[a]] -> [[a]]
+cols' [] = []
+cols' x = (concat (take 3 x)) : cols' (drop 3 x)
 
 -- * D3
 
