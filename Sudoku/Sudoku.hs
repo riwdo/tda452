@@ -165,7 +165,15 @@ isOkayBlock (x:xs) = (notElem x xs) && isOkayBlock xs
 -- * D2
 
 blocks :: Sudoku -> [Block]
-blocks = undefined
+blocks (Sudoku sudoku) = getRow sudoku ++ getCol sudoku ++ rows' sudoku
+
+getRow :: [[a]] -> [[a]]
+getRow [] = []
+getRow x = take 9 x ++ getRow (drop 9 x)
+
+getCol :: [[a]] -> [[a]]
+getCol [] = []
+getCol x = transpose (take 9 x) ++ getCol (drop 9 x)
 
 rows' :: [[a]] -> [[a]]
 rows' [] = []
@@ -181,4 +189,8 @@ prop_blocks = undefined
 -- * D3
 
 isOkay :: Sudoku -> Bool
-isOkay = undefined
+isOkay (Sudoku sudoku) = checkBlocks (blocks (Sudoku sudoku))
+
+checkBlocks :: [Block] -> Bool
+checkBlocks [] = True
+checkBlocks (x:xs) = isOkayBlock x && checkBlocks xs
