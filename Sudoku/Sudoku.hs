@@ -210,5 +210,15 @@ saveBlank (x:xs) pos = saveBlankCol x pos ++ saveBlank xs (fst pos + 1, snd pos)
 
 saveBlankCol :: [Maybe Int] -> Pos -> [Pos]
 saveBlankCol [] _ = []
-saveBlankCol (x:xs) pos = case x of Nothing -> [pos] ++ saveBlankCol xs (fst pos, snd pos +1)
+saveBlankCol (x:xs) pos = case x of Nothing -> [pos] ++ saveBlankCol xs (fst pos, snd pos + 1)
                                     _ -> saveBlankCol xs (fst pos, snd pos +1)
+
+-- E2*
+
+(!!=) :: [a] -> (Int, a) -> [a]
+(!!=) (x:list) pair = putInList (x:list) pair 0
+
+putInList :: [a] -> (Int, a) -> Int -> [a]
+putInList [] pair index = error "index not in list"
+putInList (x:list) pair index | (index == fst pair) = [snd pair] ++ (x:list)
+                              | otherwise = [x] ++ putInList list pair (index+1)
