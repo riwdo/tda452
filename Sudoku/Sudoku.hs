@@ -194,3 +194,21 @@ isOkay (Sudoku sudoku) = checkBlocks (blocks (Sudoku sudoku))
 checkBlocks :: [Block] -> Bool
 checkBlocks [] = True
 checkBlocks (x:xs) = isOkayBlock x && checkBlocks xs
+
+------------------------------------------------------------------------
+
+-- E1*
+
+type Pos = (Int,Int)
+
+blanks :: Sudoku -> [Pos]
+blanks (Sudoku sudoku) = saveBlank sudoku (0,0)
+
+saveBlank :: [[Maybe Int]] -> Pos -> [Pos]
+saveBlank [] _ = []
+saveBlank (x:xs) pos = saveBlankCol x pos ++ saveBlank xs (fst pos + 1, snd pos)
+
+saveBlankCol :: [Maybe Int] -> Pos -> [Pos]
+saveBlankCol [] _ = []
+saveBlankCol (x:xs) pos = case x of Nothing -> [pos] ++ saveBlankCol xs (fst pos, snd pos +1)
+                                    _ -> saveBlankCol xs (fst pos, snd pos +1)
