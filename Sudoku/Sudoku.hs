@@ -221,4 +221,16 @@ update (Sudoku sudoku) (yIN,xIN) newValue = Sudoku [if y == yIN then ((head sudo
 -- E4*
 
 candidates :: Sudoku -> Pos -> [Int]
-candidates (Sudoku sudoku) (y,x) = [value | value <- [1..9], isOkay (update (Sudoku sudoku) (y,x) (Just value))]
+candidates (Sudoku sudoku) (y,x) = [value | value <- [1..9], isOkay (update (Sudoku sudoku) (y,x) (Just value)) && isSudoku (update (Sudoku sudoku) (y,x) (Just value))]
+
+--prop_candidates :: Sudoku -> Pos -> Bool
+--prop_candidates (Sudoku sudoku) (y,x) = and [True | value <- [1..9], isOkay (update (Sudoku sudoku) (y,x) (Just value)) && isSudoku (update (Sudoku sudoku) (y,x) (Just value))]
+
+-- F1*
+
+solve :: Sudoku -> Maybe Sudoku
+solve (Sudoku sudoku) = if (isSudoku (Sudoku sudoku) && isFilled (Sudoku sudoku) && isOkay (Sudoku sudoku)) then solve' (Sudoku sudoku) else Nothing
+
+solve' :: Sudoku -> Maybe Sudoku
+sovle' (Sudoku sudoku) | blanks (Sudoku sudoku) == [] = Just (Sudoku sudoku)
+                       | otherwise = []
