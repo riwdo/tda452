@@ -204,7 +204,7 @@ type Pos = (Int,Int)
 blanks :: Sudoku -> [(Int,Int)]
 blanks (Sudoku sudoku) = [(x,y)
                           | (x,col) <- zip [0..8] (head sudoku)
-                          , (y,row) <- zip [0..8] (sudoku)
+                          , (y,row) <- zip [0..8] sudoku
                           , col == Nothing
                           ]
 
@@ -215,6 +215,5 @@ blanks (Sudoku sudoku) = [(x,y)
 
 -- E3*
 
-
---update :: Sudoku -> Pos -> Maybe Int -> Sudoku
---update (Sudoku sudoku) pos newValue |
+update :: Sudoku -> Pos -> Maybe Int -> Sudoku
+update (Sudoku sudoku) (yIN,xIN) newValue = Sudoku [if y == yIN then ((head sudoku) !!= (xIN, newValue)) else row | (y,row) <- zip [0..8] sudoku]
