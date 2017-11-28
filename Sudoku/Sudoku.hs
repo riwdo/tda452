@@ -184,7 +184,7 @@ cols' [] = []
 cols' x = (concat (take 3 x)) : cols' (drop 3 x)
 
 prop_blocks :: Sudoku -> Bool
-prop_blocks = undefined
+prop_blocks (Sudoku sudoku) = length (blocks (Sudoku sudoku)) == (3*9) && and [isOkayBlock block | block <- blocks (Sudoku sudoku)]
 
 -- * D3
 
@@ -217,3 +217,7 @@ blanks (Sudoku sudoku) = [(x,y)
 
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
 update (Sudoku sudoku) (yIN,xIN) newValue = Sudoku [if y == yIN then ((head sudoku) !!= (xIN, newValue)) else row | (y,row) <- zip [0..8] sudoku]
+
+-- E4*
+
+--candidates :: Sudoku -> Pos -> [Int]
