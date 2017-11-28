@@ -216,9 +216,11 @@ saveBlankCol (x:xs) pos = case x of Nothing -> [pos] ++ saveBlankCol xs (fst pos
 -- E2*
 
 (!!=) :: [a] -> (Int, a) -> [a]
-(!!=) (x:list) pair = putInList (x:list) pair 0
+(!!=) list (index, newValue) =  [if i == index then newValue else a | (i, a) <- zip [0..] list]
 
-putInList :: [a] -> (Int, a) -> Int -> [a]
-putInList [] pair index = error "index not in list"
-putInList (x:list) pair index | (index == fst pair) = [snd pair] ++ (x:list)
-                              | otherwise = [x] ++ putInList list pair (index+1)
+
+-- E3*
+
+
+--update :: Sudoku -> Pos -> Maybe Int -> Sudoku
+--update (Sudoku sudoku) pos newValue |
