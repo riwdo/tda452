@@ -11,8 +11,8 @@ data Sudoku = Sudoku { rows :: [[Maybe Int]] }
 -- | A sample sudoku puzzle
 example :: Sudoku
 example =
-    Sudoku
-      [ [j 9,j 6,n  ,n  ,j 7,j 1,j 2,n  ,n  ]
+  Sudoku
+      [ [j 3,j 6,n  ,n  ,j 7,j 1,j 2,n  ,n  ]
       , [n  ,j 5,n  ,n  ,n  ,n  ,j 1,j 8,n  ]
       , [n  ,n  ,j 9,j 2,n  ,j 4,j 7,n  ,n  ]
       , [n  ,n  ,n  ,n  ,j 1,j 3,n  ,j 2,j 8]
@@ -220,4 +220,5 @@ update (Sudoku sudoku) (yIN,xIN) newValue = Sudoku [if y == yIN then ((head sudo
 
 -- E4*
 
---candidates :: Sudoku -> Pos -> [Int]
+candidates :: Sudoku -> Pos -> [Int]
+candidates (Sudoku sudoku) (y,x) = [value | value <- [1..9], isOkay (update (Sudoku sudoku) (y,x) (Just value))]
