@@ -201,23 +201,17 @@ checkBlocks (x:xs) = isOkayBlock x && checkBlocks xs
 
 type Pos = (Int,Int)
 
-blanks :: Sudoku -> [Pos]
-blanks (Sudoku sudoku) = saveBlank sudoku (0,0)
-
-saveBlank :: [[Maybe Int]] -> Pos -> [Pos]
-saveBlank [] _ = []
-saveBlank (x:xs) pos = saveBlankCol x pos ++ saveBlank xs (fst pos + 1, snd pos)
-
-saveBlankCol :: [Maybe Int] -> Pos -> [Pos]
-saveBlankCol [] _ = []
-saveBlankCol (x:xs) pos = case x of Nothing -> [pos] ++ saveBlankCol xs (fst pos, snd pos + 1)
-                                    _ -> saveBlankCol xs (fst pos, snd pos +1)
+blanks :: Sudoku -> [(Int,Int)]
+blanks (Sudoku sudoku) = [(x,y)
+                          | (x,col) <- zip [0..8] (head sudoku)
+                          , (y,row) <- zip [0..8] (sudoku)
+                          , col == Nothing
+                          ]
 
 -- E2*
 
 (!!=) :: [a] -> (Int, a) -> [a]
 (!!=) list (index, newValue) =  [if i == index then newValue else a | (i, a) <- zip [0..] list]
-
 
 -- E3*
 
