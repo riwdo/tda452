@@ -1,6 +1,7 @@
 import Test.QuickCheck
 import Data.Char
 import Data.List
+import Data.Maybe
 
 -------------------------------------------------------------------------
 
@@ -229,8 +230,11 @@ candidates (Sudoku sudoku) (y,x) = [value | value <- [1..9], isOkay (update (Sud
 -- F1*
 
 solve :: Sudoku -> Maybe Sudoku
-solve (Sudoku sudoku) = if (isSudoku (Sudoku sudoku) && isFilled (Sudoku sudoku) && isOkay (Sudoku sudoku)) then solve' (Sudoku sudoku) else Nothing
+solve (Sudoku sudoku) = if (isSudoku (Sudoku sudoku) && isOkay (Sudoku sudoku)) then solve' (Sudoku sudoku) (blanks (Sudoku sudoku)) else Nothing
 
-solve' :: Sudoku -> Maybe Sudoku
-sovle' (Sudoku sudoku) | blanks (Sudoku sudoku) == [] = Just (Sudoku sudoku)
-                       | otherwise = []
+solve' :: Sudoku -> [Pos] -> Maybe Sudoku
+solve' (Sudoku sudoku) | blanks (Sudoku sudoku) == [] = Just (Sudoku sudoku)
+solve' (Sudoku sudoku) = [solve' (update (Sudoku sudoku) (y,x) (Just (cand)))  | (y,x) <- blanks (Sudoku sudoku)
+                                                                          , cand  <- candidates (Sudoku sudoku) (y,x)]
+--solve' (Sudoku sudoku) [] | isFilled (Sudoku sudoku) == True = Just (Sudoku sudoku)
+--solve' (Sudoku sudoku) (x:blanks) = solve' (update (Sudoku sudoku) x (Just(head (candidates (Sudoku sudoku) x)))) blanks
