@@ -215,7 +215,7 @@ blanks' cols = [col | (col,value) <- zip [0..8] cols, isNothing value]
 -- E3*
 
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
-update (Sudoku sudoku) (yIN,xIN) newValue = Sudoku [if y == yIN then ((head sudoku) !!= (xIN, newValue)) else row | (y,row) <- zip [0..8] sudoku]
+update (Sudoku sudoku) (yIN,xIN) newValue = Sudoku [if y == yIN then (row !!= (xIN, newValue)) else row | (y,row) <- zip [0..] sudoku]
 
 -- E4*
 
@@ -236,44 +236,21 @@ addt :: [Int] -> Int -> Int
 addt [] sumation = 0
 addt (x:list) sumation = if (x + addt list sumation) == sumation then (x + addt list sumation) else x + addt list sumation
 
+
+-- F1
 solve :: Sudoku -> Maybe Sudoku
-solve (Sudoku sudoku) | (isSudoku (Sudoku sudoku) && isOkay (Sudoku sudoku)) = solve' (Sudoku sudoku) 0
+solve (Sudoku sudoku) | (isSudoku (Sudoku sudoku) && isOkay (Sudoku sudoku)) = solve' (Sudoku sudoku) (blanks (Sudoku sudoku))
                       | otherwise = Nothing
+                      where solve' (Sudoku sudoku) [] = Just (Sudoku sudoku)
+                            solve' (Sudoku sudoku) (x:blanks) | candid == [] = Nothing
+                                                              | otherwise = (listToMaybe ( catMaybes ([solve' (update (Sudoku sudoku) x (Just c)) blanks | c <- candidates (Sudoku sudoku) x ])))
+                                                            where (candid) = (candidates (Sudoku sudoku) (x))
 
-solve' :: Sudoku -> Int -> Maybe Sudoku
-solve' (Sudoku sudoku) candidateIndex | blanks (Sudoku sudoku) == [] = Just (Sudoku sudoku)
-                                    --  | not (isOkay (Sudoku sudoku)) = Nothing
-                                      | candid == [] = Nothing -- Just (Sudoku sudoku)
-                                  --  | solveagain == Nothing && candidateIndex > length candid = solveagain
-                                --      | solveagain == Just (Sudoku sudoku) = Just (Sudoku sudoku)
-                                      | solveagain == Nothing = solvenext
-                                      | otherwise = solveagain
+-- F2
+readAndSolve :: FilePath -> IO ()
+readAndSolve path = do
+      content <- readFile path
+      case (solve (Sudoku (map parseRows (lines content)))) of Nothing -> putStrLn ("No solution")
+                                                               otherwise -> printSudoku (fromJust (solve (Sudoku (map parseRows (lines content)))))
 
-                            where (blank, candid, solveagain, solvenext) = (blanks (Sudoku sudoku), candidates (Sudoku sudoku) (head blank), solve' (update (Sudoku sudoku) (head blank) (Just (candid !! candidateIndex))) 0, solve' (update (Sudoku sudoku) (head blank) (Nothing)) (candidateIndex) )
-
---loopthrough :: Sudoku -> [Int] -> Pos -> Maybe Sudoku
---loopthrough (Sudoku sudoku) [] _ = Just (Sudoku sudoku) -- Just (Sudoku sudoku)
---loopthrough (Sudoku sudoku) (x:candid) emptyPos--- | solve' (update (Sudoku sudoku) emptyPos (Just x)) 0 == Just (Sudoku sudoku) = Just (Sudoku sudoku)
-                                              --  | solve' (update (Sudoku sudoku) emptyPos (Just (x))) 0 == Nothing = solve' (update (Sudoku sudoku) emptyPos (Just (head candid))) 0
-                                                -- | (head (blanks (Sudoku sudoku))) /= emptyPos = Just (Sudoku sudoku)
-
---                                                | otherwise = loopthrough (Sudoku sudoku) candid emptyPos
-
---solve'' (Sudoku sudoku)
---solve'' :: Sudoku -> Int -> Int -> Maybe Sudoku
---solve'' (Sudoku sudoku) blankIndex candidateIndex |
-
-
---solve'' :: Sudoku -> Int -> (Int,Int) -> Maybe Sudoku
---solve'' (Sudoku sudoku) index (x,y) | isFilled (Sudoku sudoku) = Just (Sudoku sudoku)
---                                    | candid == [] = Nothing
---                                    | otherwise = solve'' (update (Sudoku sudoku) (x,y) candid)
---                                      where (blank,candid) = (blanks (Sudoku sudoku), candidates (Sudoku sudoku) (blank !! index))
---solve' :: Sudoku -> [Pos] -> Int
---solve' (Sudoku sudoku) | blanks (Sudoku sudoku) == [] = Just (Sudoku sudoku)
---solve' (Sudoku sudoku) = [ | (y,x) <- blanks (Sudoku sudoku)
-                        --   , cand <- solve'  ]
---[solve' (update (Sudoku sudoku) (y,x) (Just (cand))) | (y,x) <- blanks (Sudoku sudoku)
---                                                                          , cand  <- candidates (Sudoku sudoku) (y,x)]
---solve' (Sudoku sudoku) [] | isFilled (Sudoku sudoku) == True = Just (Sudoku sudoku)
---solve' (Sudoku sudoku) (x:blanks) = solve' (update (Sudoku sudoku) x (Just(head (candidates (Sudoku sudoku) x)))) blanks
+-- F3
