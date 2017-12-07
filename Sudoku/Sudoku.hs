@@ -202,12 +202,11 @@ isOkay (Sudoku sudoku) = and [isOkayBlock block | block <- blocks (Sudoku sudoku
 type Pos = (Int,Int)
 
 blanks :: Sudoku -> [(Int,Int)]
-blanks (Sudoku sudoku) = [(y,x)
-                          | (x,col) <- zip [0..8] (head sudoku)
-                          , (y,row) <- zip [0..8] sudoku
-                          , col == Nothing
-                          ]
+blanks (Sudoku sudoku) = [(i,col) | (i,row) <- zip [0..8] sudoku,
+                                     (col) <- (blanks' (row))]
 
+blanks' :: [Maybe Int] -> [Int]
+blanks' cols = [col | (col,value) <- zip [0..8] cols, isNothing value]
 -- E2*
 
 (!!=) :: [a] -> (Int, a) -> [a]
@@ -242,13 +241,25 @@ solve (Sudoku sudoku) | (isSudoku (Sudoku sudoku) && isOkay (Sudoku sudoku)) = s
                       | otherwise = Nothing
 
 solve' :: Sudoku -> Int -> Maybe Sudoku
-solve' (Sudoku sudoku) candidateIndex  | blank == [] && candid == [] = Just (Sudoku sudoku)
-                                       | isOkay (Sudoku sudoku) && candidateIndex >= length candid = Just (Sudoku sudoku)
-                                       | solve' (update (Sudoku sudoku) (head blank) (Just (candid !! candidateIndex))) (candidateIndex) == Nothing = solve' (update (Sudoku sudoku) (head blank) (Just (candid !! candidateIndex))) (candidateIndex+1)
-                                       | otherwise = solve' (update (Sudoku sudoku) (head blank) (Just (candid !! candidateIndex))) (0)
-                                        where (blank, candid) = (blanks (Sudoku sudoku), candidates (Sudoku sudoku) (head blank))
+solve' (Sudoku sudoku) candidateIndex | blanks (Sudoku sudoku) == [] = Just (Sudoku sudoku)
+                                    --  | not (isOkay (Sudoku sudoku)) = Nothing
+                                      | candid == [] = Nothing -- Just (Sudoku sudoku)
+                                  --  | solveagain == Nothing && candidateIndex > length candid = solveagain
+                                --      | solveagain == Just (Sudoku sudoku) = Just (Sudoku sudoku)
+                                      | solveagain == Nothing = solvenext
+                                      | otherwise = solveagain
 
+                            where (blank, candid, solveagain, solvenext) = (blanks (Sudoku sudoku), candidates (Sudoku sudoku) (head blank), solve' (update (Sudoku sudoku) (head blank) (Just (candid !! candidateIndex))) 0, solve' (update (Sudoku sudoku) (head blank) (Nothing)) (candidateIndex) )
 
+--loopthrough :: Sudoku -> [Int] -> Pos -> Maybe Sudoku
+--loopthrough (Sudoku sudoku) [] _ = Just (Sudoku sudoku) -- Just (Sudoku sudoku)
+--loopthrough (Sudoku sudoku) (x:candid) emptyPos--- | solve' (update (Sudoku sudoku) emptyPos (Just x)) 0 == Just (Sudoku sudoku) = Just (Sudoku sudoku)
+                                              --  | solve' (update (Sudoku sudoku) emptyPos (Just (x))) 0 == Nothing = solve' (update (Sudoku sudoku) emptyPos (Just (head candid))) 0
+                                                -- | (head (blanks (Sudoku sudoku))) /= emptyPos = Just (Sudoku sudoku)
+
+--                                                | otherwise = loopthrough (Sudoku sudoku) candid emptyPos
+
+--solve'' (Sudoku sudoku)
 --solve'' :: Sudoku -> Int -> Int -> Maybe Sudoku
 --solve'' (Sudoku sudoku) blankIndex candidateIndex |
 
