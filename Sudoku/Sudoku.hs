@@ -243,4 +243,6 @@ readAndSolve path = do
 
 -- F3
 isSolutionOf :: Sudoku -> Sudoku -> Bool
-isSolutionOf s1 s2 = solve s2 == s1
+isSolutionOf (Sudoku s1) (Sudoku s2) = isOkay (Sudoku s1) && isOkay (Sudoku s2) && and [if isSolutionOf' sRow s2Row == True then True else False | sRow <- s1, s2Row <- solved2 ]
+  where isSolutionOf' sRow s2Row = and [if element1 == Nothing then False else (if (fromJust element1 == fromJust element1) then True else False) | element1 <- sRow, element2 <- s2Row]
+        Just (Sudoku solved2) = solve (Sudoku s2)
