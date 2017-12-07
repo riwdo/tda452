@@ -225,18 +225,6 @@ candidates (Sudoku sudoku) (y,x) = [value | value <- [1..9], isOkay (update (Sud
 --prop_candidates :: Sudoku -> Pos -> Bool
 --prop_candidates (Sudoku sudoku) (y,x) = and [True | value <- [1..9], isOkay (update (Sudoku sudoku) (y,x) (Just value)) && isSudoku (update (Sudoku sudoku) (y,x) (Just value))]
 
--- F1*
-
-combinations :: Int -> [a] -> [[a]]
-combinations 0 _  = [ [] ]
-combinations n xs = [ y:ys | y:xs' <- tails xs
-                           , ys <- combinations (n-1) xs']
-
-addt :: [Int] -> Int -> Int
-addt [] sumation = 0
-addt (x:list) sumation = if (x + addt list sumation) == sumation then (x + addt list sumation) else x + addt list sumation
-
-
 -- F1
 solve :: Sudoku -> Maybe Sudoku
 solve (Sudoku sudoku) | (isSudoku (Sudoku sudoku) && isOkay (Sudoku sudoku)) = solve' (Sudoku sudoku) (blanks (Sudoku sudoku))
@@ -254,3 +242,5 @@ readAndSolve path = do
                                                                otherwise -> printSudoku (fromJust (solve (Sudoku (map parseRows (lines content)))))
 
 -- F3
+isSolutionOf :: Sudoku -> Sudoku -> Bool
+isSolutionOf s1 s2 = solve s2 == s1
