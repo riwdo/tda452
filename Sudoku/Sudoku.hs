@@ -215,7 +215,7 @@ blanks' cols = [col | (col,value) <- zip [0..8] cols, isNothing value]
 -- E3*
 
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
-update (Sudoku sudoku) (yIN,xIN) newValue = Sudoku [if y == yIN then ((head sudoku) !!= (xIN, newValue)) else row | (y,row) <- zip [0..8] sudoku]
+update (Sudoku sudoku) (yIN,xIN) newValue = Sudoku [if y == yIN then (row !!= (xIN, newValue)) else row | (y,row) <- zip [0..] sudoku]
 
 -- E4*
 
