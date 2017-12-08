@@ -208,8 +208,7 @@ blanks' :: [Maybe Int] -> [Int]
 blanks' cols = [col | (col,value) <- zip [0..8] cols, isNothing value]
 
 prop_blanks :: Sudoku -> Bool
-prop_blanks (Sudoku rows) = all $ map (\row -> all $ map (\elm -> elm == Nothing) row) rows
-
+prop_blanks s = and [isNothing $ (rows s)!!x!!y | (x,y) <- blanks s]
 
 -- E2*
 (!!=) :: [a] -> (Int, a) -> [a]
