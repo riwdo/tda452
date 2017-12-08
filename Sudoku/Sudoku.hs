@@ -207,6 +207,10 @@ blanks (Sudoku sudoku) = [(i,col) | (i,row) <- zip [0..8] sudoku,
 blanks' :: [Maybe Int] -> [Int]
 blanks' cols = [col | (col,value) <- zip [0..8] cols, isNothing value]
 
+prop_blanks :: Sudoku -> Bool
+prop_blanks (Sudoku rows) = all $ map (\row -> all $ map (\elm -> elm == Nothing) row) rows
+
+
 -- E2*
 (!!=) :: [a] -> (Int, a) -> [a]
 (!!=) list (index, newValue) =  [if i == index then newValue else a | (i, a) <- zip [0..] list]
