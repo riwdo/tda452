@@ -200,37 +200,43 @@ isOkay (Sudoku sudoku) = and [isOkayBlock block | block <- blocks (Sudoku sudoku
 -- E1*
 type Pos = (Int,Int)
 
+-- Takes a sudoku and returns all blank positions (e.g where the value is equal to Nothing)
 blanks :: Sudoku -> [(Int,Int)]
 blanks (Sudoku sudoku) = [(i,col) | (i,row) <- zip [0..8] sudoku,
                                      (col) <- (blanks' (row))]
+                                     where blanks' cols  = [col | (col,value) <- zip [0..8] cols, isNothing value]
 
-blanks' :: [Maybe Int] -> [Int]
-blanks' cols = [col | (col,value) <- zip [0..8] cols, isNothing value]
-
+-- prop for checking that the position actually is blank
 prop_blanks :: Sudoku -> Bool
 prop_blanks s = and [isNothing $ (rows s)!!x!!y | (x,y) <- blanks s]
 
 -- E2*
+-- takes a list and a index,value pair and uses list comprehension to create a new list with the new value at that position
 (!!=) :: [a] -> (Int, a) -> [a]
 (!!=) list (index, newValue) =  [if i == index then newValue else a | (i, a) <- zip [0..] list]
 
 -- E3*
+-- updates a given sudoku with a new value at given position
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
 update (Sudoku sudoku) (yIN,xIN) newValue = Sudoku [if y == yIN then (row !!= (xIN, newValue)) else row | (y,row) <- zip [0..] sudoku]
 
+--prop for checking that the position gets updated with the new value
 prop_update :: Sudoku -> Pos -> Maybe Int -> Bool
 prop_update (Sudoku sudoku) (yIN,xIN) newValue = and [if (row !! xIN)==  newValue then True else False | (y,row) <- zip [0..] sudoku, (x,col) <- zip [0..8] row, y == yIN, x == xIN]
 
 -- E4*
+-- Given a sudoku and a blank position the function returns all the possible values for that position
 candidates :: Sudoku -> Pos -> [Int]
 candidates (Sudoku sudoku) (y,x) = [value | value <- [1..9], isOkay (update (Sudoku sudoku) (y,x) (Just value)) && isSudoku (update (Sudoku sudoku) (y,x) (Just value))]
 
--------------------------------------------------------------------------
-
+-- prop for checking if candidates are valid
 prop_candidates :: Sudoku -> Pos -> Bool
 prop_candidates (Sudoku sudoku) (y,x) = and [True | value <- [1..9], isOkay (update (Sudoku sudoku) (y,x) (Just value)) && isSudoku (update (Sudoku sudoku) (y,x) (Just value))]
 
+-------------------------------------------------------------------------
+
 -- F1
+-- Given a sudoku solve uses backtracking and returns a solved sudoku or Nothing if there was no solution found recursively
 solve :: Sudoku -> Maybe Sudoku
 solve (Sudoku sudoku) | (isSudoku (Sudoku sudoku) && isOkay (Sudoku sudoku)) = solve' (Sudoku sudoku) (blanks (Sudoku sudoku))
                       | otherwise = Nothing
@@ -240,18 +246,21 @@ solve (Sudoku sudoku) | (isSudoku (Sudoku sudoku) && isOkay (Sudoku sudoku)) = s
                                                             where (candid) = (candidates (Sudoku sudoku) (x))
 
 -- F2
+-- Reads from a file, solves the sudoku and prints it to the solution to the console
 readAndSolve :: FilePath -> IO ()
 readAndSolve path = do
       content <- readFile path
       case (solve (Sudoku (map parseRows (lines content)))) of Nothing -> putStrLn ("No solution")
                                                                otherwise -> printSudoku (fromJust (solve (Sudoku (map parseRows (lines content)))))
 -- F3
+-- checks wether a given sudoku is a solution to another soduku and returns true if this is the case
 isSolutionOf :: Sudoku -> Sudoku -> Bool
 isSolutionOf (Sudoku s1) (Sudoku s2) = and [if (isSolutionOf' sRow s2Row) then True else False | (i,sRow) <- zip [0..8] s1, (index,s2Row) <- zip [0..8] solved2, i == index]
   where isSolutionOf' sRow s2Row = and [if element1 == Nothing then False else (if(fromJust element1 == fromJust element2) then True else False) | (i,element1) <- zip [0..8] sRow, (index,element2) <- zip [0..8] s2Row, i == index]
         Just (Sudoku solved2) = solve (Sudoku s2)
 
 -- F4
+--
 prop_solveSound :: Sudoku -> Bool
 prop_solveSound sudoku
     | solved == Nothing = True
