@@ -198,7 +198,6 @@ isOkay (Sudoku sudoku) = and [isOkayBlock block | block <- blocks (Sudoku sudoku
 ------------------------------------------------------------------------
 
 -- E1*
-
 type Pos = (Int,Int)
 
 blanks :: Sudoku -> [(Int,Int)]
@@ -207,23 +206,26 @@ blanks (Sudoku sudoku) = [(i,col) | (i,row) <- zip [0..8] sudoku,
 
 blanks' :: [Maybe Int] -> [Int]
 blanks' cols = [col | (col,value) <- zip [0..8] cols, isNothing value]
--- E2*
 
+-- E2*
 (!!=) :: [a] -> (Int, a) -> [a]
 (!!=) list (index, newValue) =  [if i == index then newValue else a | (i, a) <- zip [0..] list]
 
 -- E3*
-
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
 update (Sudoku sudoku) (yIN,xIN) newValue = Sudoku [if y == yIN then (row !!= (xIN, newValue)) else row | (y,row) <- zip [0..] sudoku]
 
--- E4*
+prop_update :: Sudoku -> Pos -> Maybe Int -> Bool
+prop_update (Sudoku sudoku) (yIN,xIN) newValue = and [if (row !! xIN)==  newValue then True else False | (y,row) <- zip [0..] sudoku, (x,col) <- zip [0..8] row, y == yIN, x == xIN]
 
+-- E4*
 candidates :: Sudoku -> Pos -> [Int]
 candidates (Sudoku sudoku) (y,x) = [value | value <- [1..9], isOkay (update (Sudoku sudoku) (y,x) (Just value)) && isSudoku (update (Sudoku sudoku) (y,x) (Just value))]
 
---prop_candidates :: Sudoku -> Pos -> Bool
---prop_candidates (Sudoku sudoku) (y,x) = and [True | value <- [1..9], isOkay (update (Sudoku sudoku) (y,x) (Just value)) && isSudoku (update (Sudoku sudoku) (y,x) (Just value))]
+-------------------------------------------------------------------------
+
+prop_candidates :: Sudoku -> Pos -> Bool
+prop_candidates (Sudoku sudoku) (y,x) = and [True | value <- [1..9], isOkay (update (Sudoku sudoku) (y,x) (Just value)) && isSudoku (update (Sudoku sudoku) (y,x) (Just value))]
 
 -- F1
 solve :: Sudoku -> Maybe Sudoku
@@ -240,7 +242,6 @@ readAndSolve path = do
       content <- readFile path
       case (solve (Sudoku (map parseRows (lines content)))) of Nothing -> putStrLn ("No solution")
                                                                otherwise -> printSudoku (fromJust (solve (Sudoku (map parseRows (lines content)))))
-
 -- F3
 isSolutionOf :: Sudoku -> Sudoku -> Bool
 isSolutionOf (Sudoku s1) (Sudoku s2) = and [if (isSolutionOf' sRow s2Row) then True else False | (i,sRow) <- zip [0..8] s1, (index,s2Row) <- zip [0..8] solved2, i == index]
@@ -248,5 +249,10 @@ isSolutionOf (Sudoku s1) (Sudoku s2) = and [if (isSolutionOf' sRow s2Row) then T
         Just (Sudoku solved2) = solve (Sudoku s2)
 
 -- F4
---prop_SolveSound :: Sudoku -> Property
---prop_SolveSound sudoku =
+prop_solveSound :: Sudoku -> Bool
+prop_solveSound sudoku
+    | solved == Nothing = True
+    | otherwise           = isSolutionOf (fromJust solved) sudoku where
+                              solved = solve sudoku
+
+fewerChecks prop = quickCheckWith stdArgs{ maxSuccess = 30 } prop
