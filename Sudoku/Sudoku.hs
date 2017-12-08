@@ -243,9 +243,10 @@ readAndSolve path = do
 
 -- F3
 isSolutionOf :: Sudoku -> Sudoku -> Bool
-isSolutionOf (Sudoku s1) (Sudoku s2) = isOkay (Sudoku s1) && isOkay (Sudoku s2) && and [if isSolutionOf' sRow s2Row == True then True else False | sRow <- s1, s2Row <- solved2 ]
-  where isSolutionOf' sRow s2Row = and [if element1 == Nothing then False else (if (fromJust element1 == fromJust element1) then True else False) | element1 <- sRow, element2 <- s2Row]
+isSolutionOf (Sudoku s1) (Sudoku s2) = and [if (isSolutionOf' sRow s2Row) then True else False | (i,sRow) <- zip [0..8] s1, (index,s2Row) <- zip [0..8] solved2, i == index]
+  where isSolutionOf' sRow s2Row = and [if element1 == Nothing then False else (if(fromJust element1 == fromJust element2) then True else False) | (i,element1) <- zip [0..8] sRow, (index,element2) <- zip [0..8] s2Row, i == index]
         Just (Sudoku solved2) = solve (Sudoku s2)
 
 -- F4
-prop_SolveSound :: Sudoku -> Property
+--prop_SolveSound :: Sudoku -> Property
+--prop_SolveSound sudoku =
