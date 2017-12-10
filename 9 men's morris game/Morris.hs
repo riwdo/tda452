@@ -53,4 +53,4 @@ possibleMove :: Morris -> Pos -> [Pos]
 possibleMove (Morris board) (y,x) | y < 3 = getRowMoves
                                   | y > 3 = getRowMoves
                                   | otherwise = getRowMoves
-                                    where getRowMoves = [(y,i) | (i, value) <- zip [0..] (getRow (Morris board) y), i == (x-1) || i == (x+1)]
+                                    where getRowMoves = [(y,i) | (i, value) <- zip [0..] (getRow (Morris board) y), i == (x-1) || i == (x+1), isNothing value]
