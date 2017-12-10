@@ -3,7 +3,7 @@ import Data.Maybe
 
 data HandMan = Empty | Add Man HandMan deriving (Show, Eq)
 
-data Man = Man deriving (Show, Eq)
+data Man = Black | White deriving (Show, Eq)
 
 type Pos = (Int, Int)
 
@@ -13,12 +13,13 @@ newtype Morris = Morris {rows :: [[Maybe Man]]}
 startingMorris = Morris [[n,n,n]
                         ,[n,n,n]
                         ,[n,n,n]
-                        ,[Just m,n,Just m,n,n,n]
+                        ,[Just w,n,Just w,n,n,n]
                         ,[n,n,n]
                         ,[n,n,n]
                         ,[n,n,n]]
                         where n = Nothing
-                              m = Man
+                              w = White
+                              b = Black
 
 blanks :: Morris -> [(Int,Int)]
 blanks (Morris board) = [(x,col) | (x,row) <- zip [0..8] board
