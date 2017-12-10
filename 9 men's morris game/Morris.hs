@@ -9,7 +9,7 @@ data Man = Black | White deriving (Show, Eq)
 newtype Morris = Morris {rows :: [[Maybe Man]]}
   deriving (Show, Eq)
 
-startingMorris = Morris [[n,n,n]
+startingMorris = Morris [[Just w,n,n]
                         ,[n,n,n]
                         ,[n,n,n]
                         ,[Just w,n,Just w,n,n,n]
@@ -45,3 +45,12 @@ mans (Morris board) man = [(y,col) | (y,row) <- zip [0..8] board
   -- updates a given Morris board with a new man at given position
 updateBoard :: Morris -> Maybe Man -> Pos -> Morris
 updateBoard (Morris board) newValue (yIN,xIN) = Morris [if y == yIN then (row !!= (xIN, newValue)) else row | (y,row) <- zip [0..] board]
+
+getRow :: Morris -> Int -> [Maybe Man]
+getRow (Morris board) rowNbr = head [row | (i, row) <- zip [0..] board, i == rowNbr]
+
+possibleMove :: Morris -> Pos -> [Pos]
+possibleMove (Morris board) (y,x) | y < 3 = getRowMoves
+                                  | y > 3 = getRowMoves
+                                  | otherwise = getRowMoves
+                                    where getRowMoves = [(y,i) | (i, value) <- zip [0..] (getRow (Morris board) y), i == (x-1) || i == (x+1)]
