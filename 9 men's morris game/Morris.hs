@@ -25,3 +25,12 @@ blanks :: Morris -> [(Int,Int)]
 blanks (Morris board) = [(x,col) | (x,row) <- zip [0..8] board
                           , col <- blanks' row]
                           where blanks' row  = [col | (col,value) <- zip [0..8] row, isNothing value]
+
+--mill :: Morris -> Man -> Bool
+--mill (Morris board) player | player == Black =
+--                           | otherwise =
+
+mans :: Morris -> Maybe Man -> [(Int,Int)]
+mans (Morris board) man = [(x,col) | (x,row) <- zip [0..8] board
+                         , col <- blanks' row]
+                         where blanks' row  = [col | (col,value) <- zip [0..8] row, isNothing value == False, value == (man)]
