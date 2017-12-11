@@ -40,9 +40,9 @@ blanks (Morris board) = [(y,col) | (y,row) <- zip [0..8] board
                           where blanks' row  = [col | (col,value) <- zip [0..8] row, isNothing value]
 
 -- Check if each player has formed a mill and returns a bool if that's the case.
---mill :: Morris -> Man -> Bool
---mill (Morris board) player | player == Black = [checkNeighbours (y,x) | (y,x) <- (mans (Morris board) player)]
---                           | otherwise =
+mill :: Morris -> Man -> [Bool]
+mill (Morris board) player = [checkX (y,x) (y,x) player | (y,x) <- (mans (Morris board) (Just player))] ++ [checkY (y,x) (y,x) player | (y,x) <- (mans (Morris board) (Just player))]
+
 
 --checkA :: [(Int,Int)] -> (Int,Int) -> (Int,Int) -> [(Int,Int)]
 --checkA neighbours (y,x) prevState = (y,x) ++ [value | value <- neighbours, y == fst value, value /= prevState]
@@ -54,6 +54,7 @@ checkX (y,x) prevState player | length [value | value <- neighbours, y == fst va
                                           checkX (head [value | value <- neighbours, y == (fst value)]) (y,x) player
                                         else
                                           False
+
                               | otherwise = if (length [True | element <- list, checkPos element /= Just player] /= 0) then False else True
                               where (neighbours, list) = ((adjacentElements ! (y,x)), ([(y,x)] ++ [value | value <- neighbours, y == fst value, value /= prevState]))
 
@@ -68,9 +69,9 @@ checkY (y,x) prevState player | length [value | value <- neighbours, x == snd va
                               where (neighbours, list) = ((adjacentElements ! (y,x)), ([(y,x)] ++ [value | value <- neighbours, x == snd value, value /= prevState]))
 
 
-checkPos :: (Int,Int) -> [Maybe Man]
-checkPos (yIn,xIn) = head [(list) | (y,list) <- zip [0..] (listPair startingMorris)]
-    where checkRow list y = head [man | (x,man) <- zip [0..] list, yIn == y, xIn == x]
+checkPos :: (Int,Int) -> Maybe Man
+checkPos (yIn,xIn) = head ([checkRow list y yIn xIn | (y,list) <- zip [0..] (listPair startingMorris)] !! yIn)
+    where checkRow list y yIn xIn = [man | (x,man) <- zip [0..] list,yIn == y,xIn ==x]
 
 
 type Pos = (Int,Int)
