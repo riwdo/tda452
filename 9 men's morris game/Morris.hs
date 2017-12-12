@@ -59,27 +59,6 @@ checkMill vertical (y,x) prevState player | length [value | value <- neighbours,
                               where (neighbours, list) = ((adjacentElements ! (y,x)), ([(y,x)] ++ [value | value <- neighbours, case vertical of True -> x == snd value
                                                                                                                                                  False -> y == fst value, value /= prevState]))
 
-
-checkX :: (Int, Int) -> (Int, Int) -> Man -> Bool
-checkX (y,x) prevState player | length [value | value <- neighbours, y == fst value] == 1 =
-                                        if checkPos (y,x) == Just player then
-                                          checkX (head [value | value <- neighbours, y == (fst value)]) (y,x) player
-                                        else
-                                          False
-                              | otherwise = if (length [True | element <- list, checkPos element /= Just player] /= 0) then False else True
-                              where (neighbours, list) = ((adjacentElements ! (y,x)), ([(y,x)] ++ [value | value <- neighbours, y == fst value, value /= prevState]))
-
-
-checkY :: (Int, Int) -> (Int, Int) -> Man -> Bool
-checkY (y,x) prevState player | length [value | value <- neighbours, x == snd value] == 1 =
-                                        if checkPos (y,x) == Just player then
-                                          checkY (head [value | value <- neighbours, x == (snd value)]) (y,x) player
-                                        else
-                                          False
-                              | otherwise = if (length [True | element <- list, checkPos element /= Just player] /= 0) then False else True
-                              where (neighbours, list) = ((adjacentElements ! (y,x)), ([(y,x)] ++ [value | value <- neighbours, x == snd value, value /= prevState]))
-
-
 checkPos :: (Int,Int) -> Maybe Man
 checkPos (yIn,xIn) = head ([checkRow list y yIn xIn | (y,list) <- zip [0..] (listPair startingMorris)] !! yIn)
     where checkRow list y yIn xIn = [man | (x,man) <- zip [0..] list,yIn == y,xIn ==x]
