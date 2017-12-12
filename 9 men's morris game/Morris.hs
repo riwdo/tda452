@@ -20,7 +20,7 @@ adjacentElements = fromList [((0,0),[(0,1),(3,0)]),((0,1),[(0,0),(0,2),(1,1)]),(
                             ,((5,2),[(5,1),(3,4)]),((6,0),[(3,0),(6,1)]),((6,1),[(6,0),(5,1),(6,2)]),((6,2),[(6,1),(3,5)])]
 
 -- Empty board
-startingMorris = Morris [[Just w,Just w,Just w]
+startingMorris = Morris [[Just w,n,Just w]
                         ,[n,Just w,n]
                         ,[n,n,n]
                         ,[Just w,n,Just w,n,n,n]
@@ -91,6 +91,9 @@ possibleMovePhaseTwo (Morris board) (y,x) | y < 3 = getRowMoves
 
 removeMan :: Morris -> Pos -> Morris
 removeMan board (y,x) = updateBoard board Nothing (y,x)
+
+moveMan  :: Morris -> Pos -> Pos -> Morris
+moveMan board currentPos newPos = removeMan (updateBoard board (checkPos currentPos) newPos) currentPos
 -- If a player only has three men left they are allowed to "fly" e.g move to any other point on the board.
 -- possibleMovePhaseThree
 
