@@ -23,10 +23,10 @@ adjacentElements = fromList [((0,0),[(0,1),(3,0)]),((0,1),[(0,0),(0,2),(1,1)]),(
 startingMorris = Morris [[Just w,Just w,Just w]
                         ,[n,Just w,n]
                         ,[n,n,n]
-                        ,[n,n,Just w,n,n,n]
+                        ,[Just w,n,Just w,n,n,n]
                         ,[n,n,n]
                         ,[n,n,n]
-                        ,[n,n,n]]
+                        ,[Just w,n,n]]
                         where n = Nothing
                               w = White
                               b = Black
@@ -40,8 +40,8 @@ blanks (Morris board) = [(y,col) | (y,row) <- zip [0..8] board
                           where blanks' row  = [col | (col,value) <- zip [0..8] row, isNothing value]
 
 -- Check if each player has formed a mill and returns a bool if that's the case.
-mill :: Morris -> Man -> [Bool]
-mill (Morris board) player = [checkMill False (y,x) (y,x) player | (y,x) <- (mans (Morris board) (Just player))] ++ [checkMill True (y,x) (y,x) player | (y,x) <- (mans (Morris board) (Just player))]
+mill :: Morris -> (Int,Int) ->  Man -> [Bool]
+mill (Morris board) (y,x) player = [checkMill False (y,x) (y,x) player] ++ [checkMill True (y,x) (y,x) player]
 
 
 --checkA :: [(Int,Int)] -> (Int,Int) -> (Int,Int) -> [(Int,Int)]
@@ -89,6 +89,8 @@ possibleMovePhaseTwo (Morris board) (y,x) | y < 3 = getRowMoves
                                   | otherwise = getRowMoves
                                     where getRowMoves = [(y,i) | (i, value) <- zip [0..] (getRow (Morris board) y), i == (x-1) || i == (x+1), isNothing value]
 
+removeMan :: Morris -> Pos -> Morris
+removeMan board (y,x) = updateBoard board Nothing (y,x)
 -- If a player only has three men left they are allowed to "fly" e.g move to any other point on the board.
 -- possibleMovePhaseThree
 
