@@ -99,3 +99,7 @@ removeMan board (y,x) = updateBoard board Nothing (y,x)
 
 --showBoard :: Morris -> IO ()
 --showBoard (Morris board) = putStrLn (formatMorris board)
+
+
+
+----------------------------------Properties-----------------------------------------------

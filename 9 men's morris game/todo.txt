@@ -1,0 +1,18 @@
+*
+*
+* IO
+*   Print out
+* Props
+*   Test the code
+* Mill
+*      remove the other players Men
+* Place
+*     Place Men
+*
+* Change Turn
+*     Change player turn
+* Move
+*   Move Men when all Men are placed
+* Win
+*  If a player has fewer than 3 Men they lose
+*
