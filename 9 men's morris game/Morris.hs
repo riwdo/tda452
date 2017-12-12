@@ -13,10 +13,10 @@ newtype Morris = Morris {listPair :: [[Maybe Man]]}
 
 -- Create a map that gives adjacentElements given a key coordinate
 adjacentElements = fromList [((0,0),[(0,1),(3,0)]),((0,1),[(0,0),(0,2),(1,1)]),((0,2),[(0,1),(3,5)]),((1,0),[(1,1),(3,1)])
-                            ,((1,1),[(0,1),(2,1)]),((1,2),[(1,1),(3,4)]),((2,0),[(2,1),(3,2)]),((2,1),[(2,0),(1,1),(2,2)])
-                            ,((2,2),[(2,1),(3,3)]),((3,0),[(0,0),(3,1),(6,0)]),((3,1),[(3,0),(3,2)]),((3,2),[(2,0),(4,0)])
-                            ,((3,3),[(2,2),(3,4),(4,2)]),((3,4),[(3,3),(3,5)]),((3,5),[(0,2),(3,4),(6,2)]),((4,0),[(3,2),(4,1)])
-                            ,((4,1),[(4,0),(4,2)]),((4,2),[(4,1),(3,3)]),((5,0),[(3,1),(5,1)]),((5,1),[(5,0),(4,1),(5,2)])
+                            ,((1,1),[(0,1),(2,1),(1,0),(1,2)]),((1,2),[(1,1),(3,4)]),((2,0),[(2,1),(3,2)]),((2,1),[(2,0),(1,1),(2,2)])
+                            ,((2,2),[(2,1),(3,3)]),((3,0),[(0,0),(3,1),(6,0)]),((3,1),[(3,0),(3,2),(1,0),(5,0)]),((3,2),[(2,0),(4,0),(3,1)])
+                            ,((3,3),[(2,2),(3,4),(4,2)]),((3,4),[(3,3),(3,5),(1,2),(5,2)]),((3,5),[(0,2),(3,4),(6,2)]),((4,0),[(3,2),(4,1)])
+                            ,((4,1),[(4,0),(4,2),(5,1)]),((4,2),[(4,1),(3,3)]),((5,0),[(3,1),(5,1)]),((5,1),[(5,0),(4,1),(5,2),(6,1)])
                             ,((5,2),[(5,1),(3,4)]),((6,0),[(3,0),(6,1)]),((6,1),[(6,0),(5,1),(6,2)]),((6,2),[(6,1),(3,5)])]
 
 -- Empty board
@@ -47,6 +47,18 @@ mill (Morris board) player = [checkX (y,x) (y,x) player | (y,x) <- (mans (Morris
 --checkA :: [(Int,Int)] -> (Int,Int) -> (Int,Int) -> [(Int,Int)]
 --checkA neighbours (y,x) prevState = (y,x) ++ [value | value <- neighbours, y == fst value, value /= prevState]
 
+checkMill :: Bool -> (Int, Int) -> (Int, Int) -> Man -> Bool
+checkMill vertical (y,x) prevState player | length [value | value <- neighbours, case vertical of True -> x == snd value
+                                                                                                  False -> y == fst value] == 1 =
+                                        if checkPos (y,x) == Just player then
+                                          checkX (head [value | value <- neighbours, case vertical of True -> x == snd value
+                                                                                                      False -> y == fst value]) (y,x) player
+                                        else
+                                          False
+                              | otherwise = if (length [True | element <- list, checkPos element /= Just player] /= 0) then False else True
+                              where (neighbours, list) = ((adjacentElements ! (y,x)), ([(y,x)] ++ [value | value <- neighbours, case vertical of True -> x == snd value
+                                                                                                                                                 False -> y == fst value, value /= prevState]))
+
 
 checkX :: (Int, Int) -> (Int, Int) -> Man -> Bool
 checkX (y,x) prevState player | length [value | value <- neighbours, y == fst value] == 1 =
@@ -54,7 +66,6 @@ checkX (y,x) prevState player | length [value | value <- neighbours, y == fst va
                                           checkX (head [value | value <- neighbours, y == (fst value)]) (y,x) player
                                         else
                                           False
-
                               | otherwise = if (length [True | element <- list, checkPos element /= Just player] /= 0) then False else True
                               where (neighbours, list) = ((adjacentElements ! (y,x)), ([(y,x)] ++ [value | value <- neighbours, y == fst value, value /= prevState]))
 
