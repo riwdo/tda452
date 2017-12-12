@@ -1,11 +1,9 @@
+module Morris where
+import Man
+import RunGame
 import Data.Maybe
 import Data.Map.Strict
 -- Define Morris board
-
-data HandMan = Empty | Add Man HandMan deriving (Show, Eq)
-
-data Man = Black | White deriving (Show, Eq)
-
 
 newtype Morris = Morris {listPair :: [[Maybe Man]]}
   deriving (Show, Eq)
@@ -20,6 +18,7 @@ adjacentElements = fromList [((0,0),[(0,1),(3,0)]),((0,1),[(0,0),(0,2),(1,1)]),(
                             ,((5,2),[(5,1),(3,4)]),((6,0),[(3,0),(6,1)]),((6,1),[(6,0),(5,1),(6,2)]),((6,2),[(6,1),(3,5)])]
 
 -- Empty board
+startingMorris :: Morris
 startingMorris = Morris [[Just w,n,Just w]
                         ,[n,Just w,n]
                         ,[n,n,n]
@@ -30,7 +29,6 @@ startingMorris = Morris [[Just w,n,Just w]
                         where n = Nothing
                               w = White
                               b = Black
-
 
 
 -- Get all blank positions
