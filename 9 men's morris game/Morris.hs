@@ -41,7 +41,7 @@ blanks (Morris board) = [(y,col) | (y,row) <- zip [0..8] board
 
 -- Check if each player has formed a mill and returns a bool if that's the case.
 mill :: Morris -> Man -> [Bool]
-mill (Morris board) player = [checkX (y,x) (y,x) player | (y,x) <- (mans (Morris board) (Just player))] ++ [checkY (y,x) (y,x) player | (y,x) <- (mans (Morris board) (Just player))]
+mill (Morris board) player = [checkMill False (y,x) (y,x) player | (y,x) <- (mans (Morris board) (Just player))] ++ [checkMill True (y,x) (y,x) player | (y,x) <- (mans (Morris board) (Just player))]
 
 
 --checkA :: [(Int,Int)] -> (Int,Int) -> (Int,Int) -> [(Int,Int)]
@@ -51,8 +51,8 @@ checkMill :: Bool -> (Int, Int) -> (Int, Int) -> Man -> Bool
 checkMill vertical (y,x) prevState player | length [value | value <- neighbours, case vertical of True -> x == snd value
                                                                                                   False -> y == fst value] == 1 =
                                         if checkPos (y,x) == Just player then
-                                          checkX (head [value | value <- neighbours, case vertical of True -> x == snd value
-                                                                                                      False -> y == fst value]) (y,x) player
+                                          checkMill vertical (head [value | value <- neighbours, case vertical of True -> x == snd value
+                                                                                                                  False -> y == fst value]) (y,x) player
                                         else
                                           False
                               | otherwise = if (length [True | element <- list, checkPos element /= Just player] /= 0) then False else True
