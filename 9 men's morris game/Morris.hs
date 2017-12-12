@@ -61,7 +61,6 @@ checkPos :: (Int,Int) -> Maybe Man
 checkPos (yIn,xIn) = head ([checkRow list y yIn xIn | (y,list) <- zip [0..] (listPair startingMorris)] !! yIn)
     where checkRow list y yIn xIn = [man | (x,man) <- zip [0..] list,yIn == y,xIn ==x]
 
-
 type Pos = (Int,Int)
 
 -- Given a board and a Man returns the positions of that player's mans
@@ -77,15 +76,6 @@ mans (Morris board) man = [(y,col) | (y,row) <- zip [0..8] board
   -- updates a given Morris board with a new man at given position
 updateBoard :: Morris -> Maybe Man -> Pos -> Morris
 updateBoard (Morris board) newValue (yIN,xIN) = Morris [if y == yIN then (row !!= (xIN, newValue)) else row | (y,row) <- zip [0..] board]
-
-getRow :: Morris -> Int -> [Maybe Man]
-getRow (Morris board) rowNbr = head [row | (i, row) <- zip [0..] board, i == rowNbr]
-
-possibleMovePhaseTwo :: Morris -> Pos -> [Pos]
-possibleMovePhaseTwo (Morris board) (y,x) | y < 3 = getRowMoves
-                                  | y > 3 = getRowMoves
-                                  | otherwise = getRowMoves
-                                    where getRowMoves = [(y,i) | (i, value) <- zip [0..] (getRow (Morris board) y), i == (x-1) || i == (x+1), isNothing value]
 
 removeMan :: Morris -> Pos -> Morris
 removeMan board (y,x) = updateBoard board Nothing (y,x)
