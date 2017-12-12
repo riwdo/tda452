@@ -97,3 +97,7 @@ possibleMovePhaseTwo (Morris board) (y,x) | y < 3 = getRowMoves
 
 --showBoard :: Morris -> IO ()
 --showBoard (Morris board) = putStrLn (formatMorris board)
+
+
+
+----------------------------------Properties-----------------------------------------------
