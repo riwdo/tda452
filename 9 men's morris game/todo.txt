@@ -1,0 +1,15 @@
+*
+*
+* IO
+*
+* Props
+*
+* Mill
+*
+* Place
+*
+* Move
+*
+* Win
+*
+*
