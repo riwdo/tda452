@@ -40,9 +40,9 @@ formatSudoku (x:xs) = getElement x ++  "\n" ++ formatSudoku xs
 
 getElement :: [Maybe Man] -> String
 getElement [] = ""
-getElement (x:xs) | x == n = ".\t" ++ getElement xs
+getElement (x:xs) | x == n = "_\t" ++ getElement xs
                   | x == (Just Blank) = "\t" ++ getElement xs
-                  | otherwise = show (Prelude.take 1 (show (fromJust x))) ++ "\t"++ getElement xs
+                  | otherwise = (Prelude.take 1 (show (fromJust x))) ++ "\t"++ getElement xs
                   where n = Nothing
                         j = Just
                         b = Blank
