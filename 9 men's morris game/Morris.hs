@@ -16,9 +16,13 @@ adjacentElements = fromList [((0,0),[(0,3),(3,0)]),((0,3),[(0,0),(0,6),(1,3)]),(
                             ,((4,3),[(4,2),(4,4),(5,3)]),((4,4),[(4,3),(3,4)]),((5,1),[(3,1),(5,3)]),((5,3),[(5,1),(4,3),(5,5),(6,3)])
                             ,((5,5),[(5,3),(3,5)]),((6,0),[(3,0),(6,3)]),((6,3),[(6,0),(5,3),(6,6)]),((6,6),[(6,3),(3,6)])]
 
-getAdjacentElements :: (Int,Int) -> [(Int,Int)]
-getAdjacentElements coordinate = adjacentElements ! coordinate
+menToMove :: Morris -> Man -> [Pos]
+menToMove board player = [match coordinate | coordinate <- (mans board (Just player))]
+                where match coordinate = head [adjCoord | adjCoord <- (adjacentElements ! coordinate), isNothing (checkPos board (adjCoord))]
 
+getAdjacentElements :: Morris -> (Int,Int) -> [(Int,Int)]
+getAdjacentElements board coordinate = [match adjacentCoord | adjacentCoord <- (adjacentElements ! coordinate)]
+                where match adjacentCoord = head [adjacentCoord | coordinate <- (mans board (Just Black)) ++ (mans board (Just White)), adjacentCoord /= coordinate]
 -- Empty board
 startingMorris :: Morris
 startingMorris = Morris [[n,      Just bl,Just bl,  n, Just bl,Just bl,          n]
@@ -53,7 +57,7 @@ addPlayer :: HandMan -> HandMan
 addPlayer (Add man hand) = (Add (man) Empty)
 
 fullHand :: Man -> HandMan
-fullHand player = Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) Empty))))))))
+fullHand player = Add (player) (Add (player) (Add (player) (Add (player)  Empty)))
 
 -- Get all blank positions
 blanks :: Morris -> [(Int,Int)]
@@ -121,6 +125,7 @@ implementation = Interface
     , iUpdateBoard= updateBoard
     , iRemoveMan  = removeMan
     , iMoveMan    = moveMan
+    , iGameOver   = gameOver
     }
 
 main :: IO ()
@@ -128,6 +133,5 @@ main = runGame implementation
 
 
 ----------------------------------Properties-----------------------------------------------
-
 prop_updateBoard :: Morris -> Maybe Man -> Pos -> Bool
 prop_updateBoard (Morris morris) newValue pos = and [if (row !! xIN)==  newValue then True else False | (y,row) <- zip [0..] morris, (x,col) <- zip [0..8] row, y == yIN, x == xIN]
