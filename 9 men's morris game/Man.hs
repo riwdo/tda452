@@ -1,4 +1,5 @@
 module Man where
+import Test.QuickCheck
 
 data HandMan = Empty | Add Man HandMan deriving (Show, Eq)
 
