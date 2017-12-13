@@ -133,5 +133,28 @@ main = runGame implementation
 
 
 ----------------------------------Properties-----------------------------------------------
+testMorris :: Morris
+testMorris = Morris [[n,      Just bl,Just bl,  n, Just bl,Just bl,          n]
+                        ,[Just bl,   n,   Just bl,  n, Just bl,   n,       Just bl]
+                        ,[Just bl,Just bl,    n,    n,    n,   Just bl,    Just bl]
+                        ,[n,         n,       n, Just bl, n,      n,             n]
+                        ,[Just bl,Just bl,    n,    n,    n,   Just bl,    Just bl]
+                        ,[Just bl,   n,    Just bl, n, Just bl,   n,       Just bl]
+                        ,[n,      Just bl, Just bl, n, Just bl,Just bl,         n]]
+                        where n = Nothing
+                              bl= Blank
+                              w = White
+                              b = Black
+
+
+cell :: Gen (Maybe Man)
+cell = frequency [(9, return Nothing), (1, elements [Just n | n <- arbitrary man]
+
+instance Arbitrary Morris where
+  arbitrary =
+    do rows <- vectorOf 7 (vectorOf 3 cell)
+       return (Morris rows)
+
+
 prop_updateBoard :: Morris -> Maybe Man -> Pos -> Bool
-prop_updateBoard (Morris morris) newValue pos = and [if (row !! xIN)==  newValue then True else False | (y,row) <- zip [0..] morris, (x,col) <- zip [0..8] row, y == yIN, x == xIN]
+prop_updateBoard (Morris morris) newValue (yIN,xIN) = and [if (row !! xIN)==  newValue then True else False | (y,row) <- zip [0..] morris, (x,col) <- zip [0..8] row, y == yIN, x == xIN]
