@@ -13,10 +13,12 @@ adjacentElements = fromList [((0,0),[(0,3),(3,0)]),((0,3),[(0,0),(0,6),(1,3)]),(
                             ,((4,3),[(4,2),(4,4),(5,3)]),((4,4),[(4,3),(3,4)]),((5,1),[(3,1),(5,3)]),((5,3),[(5,1),(4,3),(5,5),(6,3)])
                             ,((5,5),[(5,3),(3,5)]),((6,0),[(3,0),(6,3)]),((6,3),[(6,0),(5,3),(6,6)]),((6,6),[(6,3),(3,6)])]
 
+--Desingates which men to move
 menToMove :: Morris -> Man -> [Pos]
 menToMove board player = [match coordinate | coordinate <- (mans board (Just player)), length (possibleMoves board coordinate) > 0]
                 where match coordinate = head [adjCoord | adjCoord <- (adjacentElements ! coordinate), isNothing (checkPos board (adjCoord))]
 
+--Calculates where men are allowed to be places
 possibleMoves :: Morris -> (Int,Int) -> [(Int,Int)]
 possibleMoves board coordinate = [adjacentCoord | adjacentCoord <- (adjacentElements ! coordinate),  isNothing (checkPos board (adjacentCoord))]
 
@@ -34,13 +36,16 @@ startingMorris = Morris [[Just b,      Just bl,Just bl,  Just b, Just bl,Just bl
                               w = White
                               b = Black
 
+--IO function for printing the board
 printBoard :: Morris -> IO ()
-printBoard board = putStrLn (formatSudoku (listPair board))
+printBoard board = putStrLn (formatMorris (listPair board))
 
-formatSudoku :: [[Maybe Man]] -> String
-formatSudoku [] = ""
-formatSudoku (x:xs) = getElement x ++  "\n" ++ formatSudoku xs
+--support function for printBoard that list all elements on the board
+formatMorris :: [[Maybe Man]] -> String
+formatMorris [] = ""
+formatMorris (x:xs) = getElement x ++  "\n" ++ formatMorris xs
 
+--suport function for formatMorris
 getElement :: [Maybe Man] -> String
 getElement [] = ""
 getElement (x:xs) | x == n = "_\t" ++ getElement xs
@@ -50,9 +55,11 @@ getElement (x:xs) | x == n = "_\t" ++ getElement xs
                         j = Just
                         b = Blank
 
+--Adds a player
 addPlayer :: HandMan -> HandMan
 addPlayer (Add man hand) = (Add (man) Empty)
 
+--Fills the players hand with men
 fullHand :: Man -> HandMan
 fullHand player = Add (player) (Add (player) (Add (player) (Add (player)  Empty)))
 
@@ -66,6 +73,7 @@ blanks (Morris board) = [(y,col) | (y,row) <- zip [0..8] board
 mill :: Morris -> (Int,Int) ->  Man -> [Bool]
 mill (board) (y,x) player = [checkMill board False (y,x) (y,x) player] ++ [checkMill board True (y,x) (y,x) player]
 
+--After a piece has been placed on the board this function checks if there exists any three in a row. The function returns how many men the player is allowed to mill
 checkMill :: Morris -> Bool -> (Int, Int) -> (Int, Int) -> Man -> Bool
 checkMill board vertical (y,x) prevState player | length [value | value <- neighbours, case vertical of True -> x == snd value
                                                                                                         False -> y == (fst value) ] == 1 =
@@ -77,7 +85,7 @@ checkMill board vertical (y,x) prevState player | length [value | value <- neigh
                               | otherwise = if (length [True | element <- list, checkPos board element /= Just player] /= 0) then False else True
                               where (neighbours, list) = ((adjacentElements ! (y,x)), ([(y,x)] ++ [value | value <- neighbours, case vertical of True -> x == snd value
                                                                                                                                                  False -> y == fst value, value /= prevState]))
-
+--Checks the position on the board
 checkPos :: Morris -> (Int,Int) -> Maybe Man
 checkPos board (yIn,xIn) = head ([checkRow list y yIn xIn | (y,list) <- zip [0..] (listPair board)] !! yIn)
     where checkRow list y yIn xIn = [man | (x,man) <- zip [0..] list,yIn == y,xIn ==x]
@@ -98,12 +106,15 @@ mans (Morris board) man = [(y,col) | (y,row) <- zip [0..8] board
 updateBoard :: Morris -> Maybe Man -> Pos -> Morris
 updateBoard (Morris board) newValue (yIN,xIN) = Morris [if y == yIN then (row !!= (xIN, newValue)) else row | (y,row) <- zip [0..] board]
 
+--Function to remove a man from the board
 removeMan :: Morris -> Pos -> Morris
 removeMan board (y,x) = updateBoard board Nothing (y,x)
 
+--Function to move a man on the board
 moveMan :: Morris -> Pos -> Pos -> Morris
 moveMan board currentPos newPos = removeMan (updateBoard board (checkPos board currentPos) newPos) currentPos
 
+--If a player has fewer than 3 pieces on the board the player is elimanted from the game
 gameOver :: Morris -> (Bool,Maybe Man)
 gameOver board | length (mans board w) < 3 = (True, w)
                | length (mans board b) < 3 = (True, b)

@@ -2,6 +2,7 @@ module RunGame where
 import Man
 import Text.Show
 
+--Inteface for the implementation
 data Interface = Interface
   { iEmptyBoard :: Morris
   , iFullHand   :: Man -> HandMan
@@ -17,10 +18,12 @@ data Interface = Interface
   , iGameOver   :: Morris -> (Bool,Maybe Man)
   }
 
+--sets up the game
 runGame :: Interface -> IO ()
 runGame i = do
     putStrLn "Welcome to the Nine men's morris!"
     phaseOne i (iEmptyBoard i) (iFullHand i Black) (iFullHand i White)
+
 
 phaseOne :: Interface -> Morris -> HandMan -> HandMan -> IO ()
 phaseOne i board Empty Empty = phaseTwo i board
