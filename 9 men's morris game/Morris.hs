@@ -15,8 +15,6 @@ adjacentElements = fromList [((0,0),[(0,3),(3,0)]),((0,3),[(0,0),(0,6),(1,3)]),(
                             ,((4,3),[(4,2),(4,4),(5,3)]),((4,4),[(4,3),(3,4)]),((5,1),[(3,1),(5,3)]),((5,3),[(5,1),(4,3),(5,5),(6,3)])
                             ,((5,5),[(5,3),(3,5)]),((6,0),[(3,0),(6,3)]),((6,3),[(6,0),(5,3),(6,6)]),((6,6),[(6,3),(3,6)])]
 
-
-
 -- Empty board
 startingMorris :: Morris
 startingMorris = Morris [[n,      Just bl,Just bl,  n, Just bl,Just bl,          n]
@@ -60,10 +58,6 @@ blanks (Morris board) = [(y,col) | (y,row) <- zip [0..8] board
 mill :: Morris -> (Int,Int) ->  Man -> [Bool]
 mill (board) (y,x) player = [checkMill board False (y,x) (y,x) player] ++ [checkMill board True (y,x) (y,x) player]
 
-
---checkA :: [(Int,Int)] -> (Int,Int) -> (Int,Int) -> [(Int,Int)]
---checkA neighbours (y,x) prevState = (y,x) ++ [value | value <- neighbours, y == fst value, value /= prevState]
-
 checkMill :: Morris -> Bool -> (Int, Int) -> (Int, Int) -> Man -> Bool
 checkMill board vertical (y,x) prevState player | length [value | value <- neighbours, case vertical of True -> x == snd value
                                                                                                         False -> y == (fst value) ] == 1 =
@@ -101,16 +95,6 @@ removeMan board (y,x) = updateBoard board Nothing (y,x)
 
 moveMan  :: Morris -> Pos -> Pos -> Morris
 moveMan board currentPos newPos = removeMan (updateBoard board (checkPos board currentPos) newPos) currentPos
-
--- If a player only has three men left they are allowed to "fly" e.g move to any other point on the board.
--- possibleMovePhaseThree
-
--- after each player's turn, show the current baord
---showBoard
-
---showBoard :: Morris -> IO ()
---showBoard (Morris board) = putStrLn (formatMorris board)
-
 
 implementation = Interface
     { iEmptyBoard = startingMorris
