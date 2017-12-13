@@ -7,6 +7,7 @@ data Interface = Interface
   , iFullHand   :: Man -> HandMan
   , iPrintBoard :: Morris -> IO ()
   , iBlanks     :: Morris -> [(Int,Int)]
+  , iGetAdjacentElements :: (Int,Int) -> [(Int,Int)]
   , iMill       :: Morris -> (Int,Int) ->  Man -> [Bool]
   , iCheckPos   :: Morris -> (Int,Int) -> Maybe Man
   , iMans       :: Morris -> Maybe Man -> [(Int,Int)]
@@ -31,21 +32,31 @@ phaseOne i board (Add player1 hand) (Add player2 hand2) = do
     let coordinate = (read input :: (Int,Int))
     let board2 = iUpdateBoard i board (Just player1) coordinate
     iPrintBoard i board2
-    if or (iMill i board2 coordinate player1) then showAndRemoveMan i board2 (Just player2) (iMill i board2 coordinate player1) else putStrLn ("")
+    if or (iMill i board2 coordinate player1)
+      then showAndRemoveMan i board2 (Just player2) (iMill i board2 coordinate player1)
+      else putStrLn ("")
     putStrLn ("White's turn")
     putStrLn ("Possible coordinates: " ++  show (iBlanks i board2))
     input <- getLine
     let coordinate = (read input :: (Int,Int))
     let board3 = iUpdateBoard i board2 (Just player2) coordinate
     iPrintBoard i board3
-    if or (iMill i board3 coordinate player2) then showAndRemoveMan i board3 (Just player1) (iMill i board3 coordinate player2) else putStrLn ("")
+    if or (iMill i board3 coordinate player2)
+      then showAndRemoveMan i board3 (Just player1) (iMill i board3 coordinate player2)
+      else putStrLn ("")
     phaseOne i board3 hand hand2
-
 
 
 phaseTwo :: Interface -> Morris -> IO ()
 phaseTwo i board = do
-  putStrLn ("Welcome to phase two")
+  putStrLn ("Phase two: Move men and form mills")
+  iPrintBoard i board
+  putStrLn ("Black's turn \n choose man to move:" ++ show (iMans i board (Just Black)))
+  input <- getLine
+  let coordinate = (read input :: (Int,Int))
+  putStrLn (show (iGetAdjacentElements i coordinate))
+  
+
 
 showAndRemoveMan :: Interface -> Morris -> Maybe Man -> [Bool] -> IO ()
 showAndRemoveMan i board playerToRemove listOfMills = do

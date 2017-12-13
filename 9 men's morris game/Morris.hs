@@ -15,6 +15,9 @@ adjacentElements = fromList [((0,0),[(0,3),(3,0)]),((0,3),[(0,0),(0,6),(1,3)]),(
                             ,((4,3),[(4,2),(4,4),(5,3)]),((4,4),[(4,3),(3,4)]),((5,1),[(3,1),(5,3)]),((5,3),[(5,1),(4,3),(5,5),(6,3)])
                             ,((5,5),[(5,3),(3,5)]),((6,0),[(3,0),(6,3)]),((6,3),[(6,0),(5,3),(6,6)]),((6,6),[(6,3),(3,6)])]
 
+getAdjacentElements :: (Int,Int) -> [(Int,Int)]
+getAdjacentElements coordinate = adjacentElements ! coordinate
+
 -- Empty board
 startingMorris :: Morris
 startingMorris = Morris [[n,      Just bl,Just bl,  n, Just bl,Just bl,          n]
@@ -25,7 +28,7 @@ startingMorris = Morris [[n,      Just bl,Just bl,  n, Just bl,Just bl,         
                         ,[Just bl,   n,    Just bl, n, Just bl,   n,       Just bl]
                         ,[n,      Just bl, Just bl, n, Just bl,Just bl,         n]]
                         where n = Nothing
-                              bl = Blank
+                              bl= Blank
                               w = White
                               b = Black
 
@@ -110,6 +113,7 @@ implementation = Interface
     , iFullHand   = fullHand
     , iPrintBoard = printBoard
     , iBlanks     = blanks
+    , iGetAdjacentElements = getAdjacentElements
     , iMill       = mill
     , iCheckPos   = checkPos
     , iMans       = mans
