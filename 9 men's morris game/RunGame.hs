@@ -8,6 +8,10 @@ data Interface = Interface
   , iCheckPos   :: (Int,Int) -> Maybe Man
   , iMans       :: Morris -> Maybe Man -> [(Int,Int)]
   , iUpdateBoard:: Morris -> Maybe Man -> Pos -> Morris
-  , iPlayBank :: Hand -> Hand
-  , iShuffle  :: StdGen -> Hand -> Hand
+  , iRemoveMan  :: Morris -> Pos -> Morris
+  , iMoveMan    :: Morris -> Pos -> Pos -> Morris
   }
+
+runGame :: Interface -> IO ()
+runGame i =
+    do putStrLn "Welcome to the game."

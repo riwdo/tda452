@@ -5,8 +5,6 @@ import Data.Maybe
 import Data.Map.Strict
 -- Define Morris board
 
-newtype Morris = Morris {listPair :: [[Maybe Man]]}
-  deriving (Show, Eq)
 
 
 -- Create a map that gives adjacentElements given a key coordinate
@@ -61,7 +59,7 @@ checkPos :: (Int,Int) -> Maybe Man
 checkPos (yIn,xIn) = head ([checkRow list y yIn xIn | (y,list) <- zip [0..] (listPair startingMorris)] !! yIn)
     where checkRow list y yIn xIn = [man | (x,man) <- zip [0..] list,yIn == y,xIn ==x]
 
-type Pos = (Int,Int)
+
 
 -- Given a board and a Man returns the positions of that player's mans
 mans :: Morris -> Maybe Man -> [(Int,Int)]
@@ -82,6 +80,7 @@ removeMan board (y,x) = updateBoard board Nothing (y,x)
 
 moveMan  :: Morris -> Pos -> Pos -> Morris
 moveMan board currentPos newPos = removeMan (updateBoard board (checkPos currentPos) newPos) currentPos
+
 -- If a player only has three men left they are allowed to "fly" e.g move to any other point on the board.
 -- possibleMovePhaseThree
 
@@ -91,6 +90,20 @@ moveMan board currentPos newPos = removeMan (updateBoard board (checkPos current
 --showBoard :: Morris -> IO ()
 --showBoard (Morris board) = putStrLn (formatMorris board)
 
+
+implementation = Interface
+    { iEmptyBoard = startingMorris
+    , iBlanks     = blanks
+    , iMill       = mill
+    , iCheckPos   = checkPos
+    , iMans       = mans
+    , iUpdateBoard= updateBoard
+    , iRemoveMan  = removeMan
+    , iMoveMan    = moveMan
+    }
+
+main :: IO ()
+main = runGame implementation
 
 
 ----------------------------------Properties-----------------------------------------------
