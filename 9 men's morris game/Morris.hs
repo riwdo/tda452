@@ -130,21 +130,6 @@ main = runGame implementation
 
 
 ----------------------------------Properties-----------------------------------------------
-
-testMorris :: Morris
-testMorris = Morris [[n,      Just bl,Just bl,  n, Just bl,Just bl,          n]
-                        ,[Just bl,   n,   Just bl,  n, Just bl,   n,       Just bl]
-                        ,[Just bl,Just bl,    n,    n,    n,   Just bl,    Just bl]
-                        ,[n,         n,       n, Just bl, n,      n,             n]
-                        ,[Just bl,Just bl,    n,    n,    n,   Just bl,    Just bl]
-                        ,[Just bl,   n,    Just bl, n, Just bl,   n,       Just bl]
-                        ,[n,      Just bl, Just bl, n, Just bl,Just bl,         n]]
-                        where n = Nothing
-                              bl= Blank
-                              w = White
-                              b = Black
-
-
 cell :: Gen (Maybe Man)
 cell = frequency [(1,return (Just Black)), (1, return (Just White))]
 
