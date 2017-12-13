@@ -93,8 +93,14 @@ updateBoard (Morris board) newValue (yIN,xIN) = Morris [if y == yIN then (row !!
 removeMan :: Morris -> Pos -> Morris
 removeMan board (y,x) = updateBoard board Nothing (y,x)
 
-moveMan  :: Morris -> Pos -> Pos -> Morris
+moveMan :: Morris -> Pos -> Pos -> Morris
 moveMan board currentPos newPos = removeMan (updateBoard board (checkPos board currentPos) newPos) currentPos
+
+gameOver :: Morris -> (Bool,Maybe Man)
+gameOver board | length (mans board w) < 3 = (True, w)
+               | length (mans board b) < 3 = (True, b)
+               | otherwise = (False, Nothing)
+               where (w,b) = (Just White, Just Black)
 
 implementation = Interface
     { iEmptyBoard = startingMorris
