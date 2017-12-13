@@ -120,3 +120,6 @@ main = runGame implementation
 
 
 ----------------------------------Properties-----------------------------------------------
+
+prop_updateBoard :: Morris -> Maybe Man -> Pos -> Bool
+prop_updateBoard (Morris morris) (yIN,xIN) newValue = and [if (row !! xIN)==  newValue then True else False | (y,row) <- zip [0..] morris, (x,col) <- zip [0..8] row, y == yIN, x == xIN]
