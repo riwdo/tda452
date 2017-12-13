@@ -128,8 +128,9 @@ implementation = Interface
 main :: IO ()
 main = runGame implementation
 
-
 ----------------------------------Properties-----------------------------------------------
+--We'd like to discuss how to better use properties and where to use them on the presentation
+
 --Generates arbitrary cells for the morris board with different board pieces
 cell :: Gen (Maybe Man)
 cell = frequency [(1,return (Just Black)), (1, return (Just White))]
