@@ -130,13 +130,16 @@ main = runGame implementation
 
 
 ----------------------------------Properties-----------------------------------------------
+--Generates arbitrary cells for the morris board with different board pieces
 cell :: Gen (Maybe Man)
 cell = frequency [(1,return (Just Black)), (1, return (Just White))]
 
+-- Genereates an arbitrary morris board and fills it with board pieces using cell
 instance Arbitrary Morris where
   arbitrary =
     do rows <- vectorOf 7 (vectorOf 7 cell)
        return (Morris rows)
 
+--Should be checking if the board is updated correctly but is not quite right yet. It only passes 1-10 tests with quickcheck
 prop_updateBoard :: Morris -> Maybe Man -> Pos -> Bool
 prop_updateBoard (Morris morris) newValue (yIN,xIN) = and [if (row !! xIN)==  newValue then True else False | (y,row) <- zip [0..] morris, (x,col) <- zip [0..8] row, y == yIN, x == xIN]
