@@ -60,10 +60,6 @@ phaseTwo i board = do
   iPrintBoard i board
   putStrLn ("Black's turn \n choose man to move:" ++ show (iMans i board (Just Black)))
   input <- getLine
-<<<<<<< HEAD
-  let coordinate = (read input :: (Int,Int))
-  putStrLn (show (iGetAdjacentElements i coordinate))
-=======
   let curPos = (read input :: (Int,Int))
   putStrLn ("Possible Moves: " ++ show (iGetAdjacentElements i board curPos))
   input <- getLine
@@ -99,7 +95,6 @@ phaseTwo i board = do
           putStrLn ("Winner: Black")
       else
         phaseTwo i board3
->>>>>>> 14b000fc3759dac15115f529c2ff397b4fed18e7
 
 
 
