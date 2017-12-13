@@ -17,7 +17,7 @@ adjacentElements = fromList [((0,0),[(0,3),(3,0)]),((0,3),[(0,0),(0,6),(1,3)]),(
                             ,((5,5),[(5,3),(3,5)]),((6,0),[(3,0),(6,3)]),((6,3),[(6,0),(5,3),(6,6)]),((6,6),[(6,3),(3,6)])]
 
 menToMove :: Morris -> Man -> [Pos]
-menToMove board player = [match coordinate | coordinate <- (mans board (Just player))]
+menToMove board player = [match coordinate | coordinate <- (mans board (Just player)), length (possibleMoves board coordinate) > 0]
                 where match coordinate = head [adjCoord | adjCoord <- (adjacentElements ! coordinate), isNothing (checkPos board (adjCoord))]
 
 possibleMoves :: Morris -> (Int,Int) -> [(Int,Int)]
@@ -25,10 +25,10 @@ possibleMoves board coordinate = [adjacentCoord | adjacentCoord <- (adjacentElem
 
 -- Empty board
 startingMorris :: Morris
-startingMorris = Morris [[n,      Just bl,Just bl,  n, Just bl,Just bl,          n]
+startingMorris = Morris [[Just b,      Just bl,Just bl,  Just b, Just bl,Just bl,          n]
                         ,[Just bl,   n,   Just bl,  n, Just bl,   n,       Just bl]
                         ,[Just bl,Just bl,    n,    n,    n,   Just bl,    Just bl]
-                        ,[n,         n,       n, Just bl, n,      n,             n]
+                        ,[Just b,         n,       n, Just bl, n,      n,             n]
                         ,[Just bl,Just bl,    n,    n,    n,   Just bl,    Just bl]
                         ,[Just bl,   n,    Just bl, n, Just bl,   n,       Just bl]
                         ,[n,      Just bl, Just bl, n, Just bl,Just bl,         n]]
@@ -149,7 +149,7 @@ testMorris = Morris [[n,      Just bl,Just bl,  n, Just bl,Just bl,          n]
 
 
 cell :: Gen (Maybe Man)
-cell = frequency [(1,return (Just Black)),(1, return (Just White))]
+cell = frequency [(1,return (Just Black)), (1, return (Just White))]
 
 instance Arbitrary Morris where
   arbitrary =
