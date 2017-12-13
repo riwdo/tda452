@@ -17,17 +17,33 @@ adjacentElements = fromList [((0,0),[(0,1),(3,0)]),((0,1),[(0,0),(0,2),(1,1)]),(
 
 -- Empty board
 startingMorris :: Morris
-startingMorris = Morris [[Just w,n,Just w]
-                        ,[n,Just w,n]
-                        ,[n,n,n]
-                        ,[Just w,n,Just w,n,n,n]
+startingMorris = Morris [[Just b,Just b,Just b]
                         ,[n,n,n]
                         ,[n,n,n]
-                        ,[Just w,n,n]]
+                        ,[n,n,n,n,n,n]
+                        ,[n,n,n]
+                        ,[n,n,n]
+                        ,[n,n,n]]
                         where n = Nothing
                               w = White
                               b = Black
 
+printBoard :: Morris -> IO ()
+printBoard board = putStrLn (formatSudoku (listPair board))
+
+formatSudoku :: [[Maybe Man]] -> String
+formatSudoku [] = ""
+formatSudoku (x:xs) = getElement x ++  "\n" ++ formatSudoku xs
+
+getElement :: [Maybe Man] -> String
+getElement [] = ""
+getElement (x:xs) | x == n = ".\t" ++ getElement xs
+                  | otherwise = show (Prelude.take 1 (show (fromJust x))) ++ "\t"++ getElement xs
+                  where n = Nothing
+                        j = Just
+
+fullHand :: Man -> HandMan
+fullHand player = Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) Empty))))))))
 
 -- Get all blank positions
 blanks :: Morris -> [(Int,Int)]
@@ -37,26 +53,26 @@ blanks (Morris board) = [(y,col) | (y,row) <- zip [0..8] board
 
 -- Check if each player has formed a mill and returns a bool if that's the case.
 mill :: Morris -> (Int,Int) ->  Man -> [Bool]
-mill (Morris board) (y,x) player = [checkMill False (y,x) (y,x) player] ++ [checkMill True (y,x) (y,x) player]
+mill (board) (y,x) player = [checkMill board False (y,x) (y,x) player] ++ [checkMill board True (y,x) (y,x) player]
 
 
 --checkA :: [(Int,Int)] -> (Int,Int) -> (Int,Int) -> [(Int,Int)]
 --checkA neighbours (y,x) prevState = (y,x) ++ [value | value <- neighbours, y == fst value, value /= prevState]
 
-checkMill :: Bool -> (Int, Int) -> (Int, Int) -> Man -> Bool
-checkMill vertical (y,x) prevState player | length [value | value <- neighbours, case vertical of True -> x == snd value
-                                                                                                  False -> y == fst value] == 1 =
-                                        if checkPos (y,x) == Just player then
-                                          checkMill vertical (head [value | value <- neighbours, case vertical of True -> x == snd value
-                                                                                                                  False -> y == fst value]) (y,x) player
+checkMill :: Morris -> Bool -> (Int, Int) -> (Int, Int) -> Man -> Bool
+checkMill board vertical (y,x) prevState player | length [value | value <- neighbours, case vertical of True -> x == snd value
+                                                                                                        False -> y == fst value] == 1 =
+                                        if checkPos board (y,x) == Just player then
+                                          checkMill board vertical (head [value | value <- neighbours, case vertical of True -> x == snd value
+                                                                                                                        False -> y == fst value]) (y,x) player
                                         else
                                           False
-                              | otherwise = if (length [True | element <- list, checkPos element /= Just player] /= 0) then False else True
+                              | otherwise = if (length [True | element <- list, checkPos board element /= Just player] /= 0) then False else True
                               where (neighbours, list) = ((adjacentElements ! (y,x)), ([(y,x)] ++ [value | value <- neighbours, case vertical of True -> x == snd value
                                                                                                                                                  False -> y == fst value, value /= prevState]))
 
-checkPos :: (Int,Int) -> Maybe Man
-checkPos (yIn,xIn) = head ([checkRow list y yIn xIn | (y,list) <- zip [0..] (listPair startingMorris)] !! yIn)
+checkPos :: Morris -> (Int,Int) -> Maybe Man
+checkPos board (yIn,xIn) = head ([checkRow list y yIn xIn | (y,list) <- zip [0..] (listPair board)] !! yIn)
     where checkRow list y yIn xIn = [man | (x,man) <- zip [0..] list,yIn == y,xIn ==x]
 
 
@@ -79,7 +95,7 @@ removeMan :: Morris -> Pos -> Morris
 removeMan board (y,x) = updateBoard board Nothing (y,x)
 
 moveMan  :: Morris -> Pos -> Pos -> Morris
-moveMan board currentPos newPos = removeMan (updateBoard board (checkPos currentPos) newPos) currentPos
+moveMan board currentPos newPos = removeMan (updateBoard board (checkPos board currentPos) newPos) currentPos
 
 -- If a player only has three men left they are allowed to "fly" e.g move to any other point on the board.
 -- possibleMovePhaseThree
@@ -93,6 +109,8 @@ moveMan board currentPos newPos = removeMan (updateBoard board (checkPos current
 
 implementation = Interface
     { iEmptyBoard = startingMorris
+    , iFullHand   = fullHand
+    , iPrintBoard = printBoard
     , iBlanks     = blanks
     , iMill       = mill
     , iCheckPos   = checkPos
