@@ -55,7 +55,7 @@ phaseTwo i board = do
   input <- getLine
   let coordinate = (read input :: (Int,Int))
   putStrLn (show (iGetAdjacentElements i coordinate))
-  
+
 
 
 showAndRemoveMan :: Interface -> Morris -> Maybe Man -> [Bool] -> IO ()

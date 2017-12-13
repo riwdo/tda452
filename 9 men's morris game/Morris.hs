@@ -3,6 +3,7 @@ import Man
 import RunGame
 import Data.Maybe
 import Data.Map.Strict
+import Test.QuickCheck
 -- Define Morris board
 
 
@@ -129,4 +130,4 @@ main = runGame implementation
 ----------------------------------Properties-----------------------------------------------
 
 prop_updateBoard :: Morris -> Maybe Man -> Pos -> Bool
-prop_updateBoard (Morris morris) (yIN,xIN) newValue = and [if (row !! xIN)==  newValue then True else False | (y,row) <- zip [0..] morris, (x,col) <- zip [0..8] row, y == yIN, x == xIN]
+prop_updateBoard (Morris morris) newValue pos = and [if (row !! xIN)==  newValue then True else False | (y,row) <- zip [0..] morris, (x,col) <- zip [0..8] row, y == yIN, x == xIN]
