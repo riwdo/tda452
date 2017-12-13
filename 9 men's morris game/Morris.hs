@@ -45,6 +45,9 @@ getElement (x:xs) | x == n = "_\t" ++ getElement xs
                         j = Just
                         b = Blank
 
+addPlayer :: HandMan -> HandMan
+addPlayer (Add man hand) = (Add (man) Empty)
+
 fullHand :: Man -> HandMan
 fullHand player = Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) Empty))))))))
 
