@@ -4,9 +4,6 @@ import RunGame
 import Data.Maybe
 import Data.Map.Strict
 import Test.QuickCheck
--- Define Morris board
-
-
 
 -- Create a map that gives adjacentElements given a key coordinate
 adjacentElements = fromList [((0,0),[(0,3),(3,0)]),((0,3),[(0,0),(0,6),(1,3)]),((0,6),[(0,3),(3,6)]),((1,1),[(1,3),(3,1)])
@@ -155,7 +152,6 @@ instance Arbitrary Morris where
   arbitrary =
     do rows <- vectorOf 7 (vectorOf 7 cell)
        return (Morris rows)
-
 
 prop_updateBoard :: Morris -> Maybe Man -> Pos -> Bool
 prop_updateBoard (Morris morris) newValue (yIN,xIN) = and [if (row !! xIN)==  newValue then True else False | (y,row) <- zip [0..] morris, (x,col) <- zip [0..8] row, y == yIN, x == xIN]
