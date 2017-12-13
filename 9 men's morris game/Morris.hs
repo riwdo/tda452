@@ -130,7 +130,6 @@ main = runGame implementation
 
 
 ----------------------------------Properties-----------------------------------------------
-
 testMorris :: Morris
 testMorris = Morris [[n,      Just bl,Just bl,  n, Just bl,Just bl,          n]
                         ,[Just bl,   n,   Just bl,  n, Just bl,   n,       Just bl]

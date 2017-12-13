@@ -34,7 +34,7 @@ phaseOne i board (Add player1 hand) (Add player2 hand2) = do
     let board2 = iUpdateBoard i board (Just player1) coordinate
     iPrintBoard i board2
     let tempBoard = board2
-    board2 <- if or (iMill i tempBoard coordinate (Black))
+    board2  <- if or (iMill i tempBoard coordinate (Black))
                 then
                 showAndRemoveMan i tempBoard (Just White) (iMill i tempBoard coordinate (White))
                 else
@@ -108,4 +108,4 @@ showAndRemoveMan i board playerToRemove listOfMills = do
   let coordinate = (read input :: (Int,Int))
   let board2 = iRemoveMan i board coordinate
   iPrintBoard i board2
-  if and listOfMills then (showAndRemoveMan i board2 (playerToRemove)) [False] else return board
+  if and listOfMills then (showAndRemoveMan i board2 (playerToRemove)) [False] else return board2
