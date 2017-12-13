@@ -19,13 +19,13 @@ adjacentElements = fromList [((0,0),[(0,3),(3,0)]),((0,3),[(0,0),(0,6),(1,3)]),(
 
 -- Empty board
 startingMorris :: Morris
-startingMorris = Morris [[Just b,Just bl, Just bl, Just b,Just bl, Just bl,Just b]
-                        ,[Just bl,Just b, Just bl,n,Just bl,n, Just bl]
-                        ,[Just bl, Just bl,n,n,n,Just bl, Just bl]
-                        ,[n,n,n,Just bl,n,n,Just b]
-                        ,[Just bl,Just bl,n,n,n,Just bl, Just bl]
-                        ,[Just bl, n, Just bl,n,Just bl, n, Just bl]
-                        ,[n,Just bl, Just bl,n,Just bl, Just bl,n]]
+startingMorris = Morris [[n,      Just bl,Just bl,  n, Just bl,Just bl,          n]
+                        ,[Just bl,   n,   Just bl,  n, Just bl,   n,       Just bl]
+                        ,[Just bl,Just bl,    n,    n,    n,   Just bl,    Just bl]
+                        ,[n,         n,       n, Just bl, n,      n,             n]
+                        ,[Just bl,Just bl,    n,    n,    n,   Just bl,    Just bl]
+                        ,[Just bl,   n,    Just bl, n, Just bl,   n,       Just bl]
+                        ,[n,      Just bl, Just bl, n, Just bl,Just bl,         n]]
                         where n = Nothing
                               bl = Blank
                               w = White
