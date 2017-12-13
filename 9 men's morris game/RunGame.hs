@@ -34,7 +34,7 @@ phaseOne i board (Add player1 hand) (Add player2 hand2) = do
     let board2 = iUpdateBoard i board (Just player1) coordinate
     iPrintBoard i board2
     --if or (iMill i board coordinate player1) then remove
-    putStrLn (show (or (iMill i board2 coordinate player1)))
+    if or (iMill i board2 coordinate player1) then showAndRemoveMan i board2 (Just player2) (iMill i board2 coordinate player1) else putStrLn ("")
     putStrLn ("Player2's turn to place Man")
     putStrLn ("Possible coordinates: " ++  show (iBlanks i board2))
     input <- getLine
@@ -49,4 +49,14 @@ phaseTwo :: Interface -> Morris -> IO ()
 phaseTwo i board = do
   putStrLn ("Welcome to phase two")
 
---removeMan ::
+showAndRemoveMan :: Interface -> Morris -> Maybe Man -> [Bool] -> IO ()
+showAndRemoveMan i board playerToRemove listOfMills = do
+  putStrLn ("Board:")
+  iPrintBoard i board
+  putStrLn ("Choose man to remove:")
+  putStrLn (show (iMans i board playerToRemove))
+  input <- getLine
+  let coordinate = (read input :: (Int,Int))
+  let board2 = iRemoveMan i board coordinate
+  iPrintBoard i board2
+  if and listOfMills then (showAndRemoveMan i board2 (playerToRemove)) [False] else putStrLn ("Next Player")
