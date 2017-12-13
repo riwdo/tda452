@@ -20,9 +20,9 @@ menToMove :: Morris -> Man -> [Pos]
 menToMove board player = [match coordinate | coordinate <- (mans board (Just player))]
                 where match coordinate = head [adjCoord | adjCoord <- (adjacentElements ! coordinate), isNothing (checkPos board (adjCoord))]
 
-getAdjacentElements :: Morris -> (Int,Int) -> [(Int,Int)]
-getAdjacentElements board coordinate = [match adjacentCoord | adjacentCoord <- (adjacentElements ! coordinate)]
-                where match adjacentCoord = head [adjacentCoord | coordinate <- (mans board (Just Black)) ++ (mans board (Just White)), adjacentCoord /= coordinate]
+possibleMoves :: Morris -> (Int,Int) -> [(Int,Int)]
+possibleMoves board coordinate = [adjacentCoord | adjacentCoord <- (adjacentElements ! coordinate),  isNothing (checkPos board (adjacentCoord))]
+
 -- Empty board
 startingMorris :: Morris
 startingMorris = Morris [[n,      Just bl,Just bl,  n, Just bl,Just bl,          n]
@@ -118,7 +118,7 @@ implementation = Interface
     , iFullHand   = fullHand
     , iPrintBoard = printBoard
     , iBlanks     = blanks
-    , iGetAdjacentElements = getAdjacentElements
+    , iGetAdjacentElements = possibleMoves
     , iMill       = mill
     , iCheckPos   = checkPos
     , iMans       = mans
@@ -133,5 +133,5 @@ main = runGame implementation
 
 
 ----------------------------------Properties-----------------------------------------------
-prop_updateBoard :: Morris -> Maybe Man -> Pos -> Bool
-prop_updateBoard (Morris morris) newValue pos = and [if (row !! xIN)==  newValue then True else False | (y,row) <- zip [0..] morris, (x,col) <- zip [0..8] row, y == yIN, x == xIN]
+--prop_updateBoard :: Morris -> Maybe Man -> Pos -> Bool
+--prop_updateBoard (Morris morris) newValue pos = and [if (row !! xIN)==  newValue then True else False | (y,row) <- zip [0..] morris, (x,col) <- zip [0..8] row, y == yIN, x == xIN]
