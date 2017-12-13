@@ -56,7 +56,7 @@ addPlayer :: HandMan -> HandMan
 addPlayer (Add man hand) = (Add (man) Empty)
 
 fullHand :: Man -> HandMan
-fullHand player = Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) Empty))))))))
+fullHand player = Add (player) (Add (player) (Add (player) (Add (player)  Empty)))
 
 -- Get all blank positions
 blanks :: Morris -> [(Int,Int)]

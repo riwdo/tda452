@@ -46,7 +46,7 @@ phaseOne i board (Add player1 hand) (Add player2 hand2) = do
     let board3 = iUpdateBoard i board2 (Just player2) coordinate
     iPrintBoard i board3
     let tempBoard = board3
-    board3 <- if or (iMill i board2 coordinate (White))
+    board3 <- if or (iMill i tempBoard coordinate (White))
                 then
                 showAndRemoveMan i tempBoard (Just Black) (iMill i tempBoard coordinate (Black))
                 else
@@ -67,7 +67,7 @@ phaseTwo i board = do
   let board2 = iMoveMan i board curPos destPos
   iPrintBoard i board2
   let tempBoard = board2
-  board2 <- if or (iMill i board2 destPos (Black))
+  board2 <- if or (iMill i tempBoard destPos (Black))
               then
               showAndRemoveMan i tempBoard (Just White) (iMill i tempBoard destPos (White))
               else
@@ -81,7 +81,7 @@ phaseTwo i board = do
   let board3 = iMoveMan i board2 curPosWhite destPosWhite
   iPrintBoard i board3
   let tempBoard = board3
-  board3 <- if or (iMill i board2 destPosWhite (White))
+  board3 <- if or (iMill i tempBoard destPosWhite (White))
               then
               showAndRemoveMan i tempBoard (Just Black) (iMill i tempBoard destPosWhite (Black))
               else
