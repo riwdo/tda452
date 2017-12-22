@@ -60,6 +60,7 @@ getElement (x:xs) | x == n = "_\t" ++ getElement xs
 fullHand :: Man -> HandMan
 fullHand player = fullHand' player 8 (Add player Empty)
 
+--helperfunction for fullHand
 fullHand' :: Man -> Int -> HandMan -> HandMan
 fullHand' player 0 hand = hand
 fullHand' player i hand = fullHand' player (i-1) ((Add player) hand)
@@ -141,8 +142,6 @@ main :: IO ()
 main = runGame implementation
 
 ----------------------------------Properties-----------------------------------------------
---We'd like to discuss how to better use properties and where to use them on the presentation
-
 --Generates arbitrary cells for the morris board with different board pieces, not properly weighted
 cell :: Gen (Maybe Man)
 cell = frequency [(1,return (Just Black)), (1, return (Just White))]
@@ -153,13 +152,17 @@ instance Arbitrary Morris where
     do rows <- vectorOf 7 (vectorOf 7 cell)
        return (Morris rows)
 
---checks if a man has moved around
+--checks if a man has moved around. If quickCheck checks with a negative value
+--or a value bigger than the board it will return true as we dont know how to handle expected exceptions
 prop_moveMan :: Morris -> (Int,Int) -> Maybe Man -> Bool
 prop_moveMan m (y,x) man | y > 6  || x > 6 || y < 0 || x < 0 = True
                          | listPair m == [] = True
                          | checkPos (updateBoard m man (y,x)) (y,x) == man = True
                          | otherwise = False
 
+
+--checks if a man has been removed around. If quickCheck checks with a negative value
+--or a value bigger than the board it will return true as we dont know how to handle expected exceptions
 prop_removeMan :: Morris -> Pos -> Bool
 prop_removeMan m (y,x) | y > 6  || x > 6 || y < 0 || x < 0 = True
                          | listPair m == [] = True
