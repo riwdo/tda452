@@ -55,13 +55,14 @@ getElement (x:xs) | x == n = "_\t" ++ getElement xs
                         j = Just
                         b = Blank
 
---Adds a player
-addPlayer :: HandMan -> HandMan
-addPlayer (Add man hand) = (Add (man) Empty)
 
 --Fills the players hand with men
 fullHand :: Man -> HandMan
-fullHand player = Add (player) (Add (player) (Add (player) (Add (player)  Empty)))
+fullHand player = fullHand' player 8 (Add player Empty)
+
+fullHand' :: Man -> Int -> HandMan -> HandMan
+fullHand' player 0 hand = hand
+fullHand' player i hand = fullHand' player (i-1) ((Add player) hand)
 
 -- Get all blank positions
 blanks :: Morris -> [(Int,Int)]
@@ -148,9 +149,39 @@ cell = frequency [(1,return (Just Black)), (1, return (Just White))]
 
 -- Genereates an arbitrary morris board and fills it with board pieces using cell
 instance Arbitrary Morris where
-  arbitrary =
-    do rows <- vectorOf 7 (vectorOf 7 cell)
-       return (Morris rows)
+  arbitrary = do
+    n1 <- cell
+    n2 <- cell
+    n3 <- cell
+    n4 <- cell
+    n5 <- cell
+    n6 <- cell
+    n7 <- cell
+    n8 <- cell
+    n9 <- cell
+    n10 <- cell
+    n11 <- cell
+    n12 <- cell
+    n13 <- cell
+    n14 <- cell
+    n15 <- cell
+    n16 <- cell
+    n17 <- cell
+    n18 <- cell
+    n19 <- cell
+    n20 <- cell
+    n21 <- cell
+    n22 <- cell
+    n23 <- cell
+    n24 <- cell
+    let rows = Morris [[n1, Just Blank,Just Blank,  n2, Just Blank,Just Blank,          n3]
+               ,[Just Blank,   n4,   Just Blank,  n5, Just Blank,   n6,       Just Blank]
+              ,[Just Blank,Just Blank,    n7,    n8,    n9,   Just Blank,    Just Blank]
+              ,[n10,         n11,       n12, Just Blank, n13,      n14,             n15]
+              ,[Just Blank,Just Blank,    n16,    n17,    n18,   Just Blank,    Just Blank]
+              ,[Just Blank,   n19,    Just Blank, n20, Just Blank,   n21,       Just Blank]
+              ,[n22,      Just Blank, Just Blank, n23, Just Blank,Just Blank,         n24]]
+    return (rows)
 
 --checks if a man has moved around
 prop_moveMan :: Morris -> (Int,Int) -> Maybe Man -> Bool
