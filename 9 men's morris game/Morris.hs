@@ -142,7 +142,7 @@ main = runGame implementation
 ----------------------------------Properties-----------------------------------------------
 --We'd like to discuss how to better use properties and where to use them on the presentation
 
---Generates arbitrary cells for the morris board with different board pieces
+--Generates arbitrary cells for the morris board with different board pieces, not properly weighted
 cell :: Gen (Maybe Man)
 cell = frequency [(1,return (Just Black)), (1, return (Just White))]
 
@@ -152,6 +152,9 @@ instance Arbitrary Morris where
     do rows <- vectorOf 7 (vectorOf 7 cell)
        return (Morris rows)
 
---Should be checking if the board is updated correctly but is not quite right yet. It only passes 1-10 tests with quickcheck
-prop_updateBoard :: Morris -> Maybe Man -> Pos -> Bool
-prop_updateBoard (Morris morris) newValue (yIN,xIN) = and [if (row !! xIN)==  newValue then True else False | (y,row) <- zip [0..] morris, (x,col) <- zip [0..8] row, y == yIN, x == xIN]
+--checks if a man has moved around
+prop_moveMan :: Morris -> (Int,Int) -> Maybe Man -> Bool
+prop_moveMan m (y,x) man | y > 6  || x > 6 || y < 0 || x < 0 = True
+                         | listPair m == [] = True
+                         | checkPos (updateBoard m man (y,x)) (y,x) == man = True
+                         | otherwise = False
