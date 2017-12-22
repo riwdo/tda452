@@ -159,3 +159,9 @@ prop_moveMan m (y,x) man | y > 6  || x > 6 || y < 0 || x < 0 = True
                          | listPair m == [] = True
                          | checkPos (updateBoard m man (y,x)) (y,x) == man = True
                          | otherwise = False
+
+prop_removeMan :: Morris -> Pos -> Bool
+prop_removeMan m (y,x) | y > 6  || x > 6 || y < 0 || x < 0 = True
+                         | listPair m == [] = True
+                         | checkPos (removeMan m (y,x)) (y,x) == Nothing = True
+                         | otherwise = False
