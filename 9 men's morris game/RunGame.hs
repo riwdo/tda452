@@ -2,13 +2,14 @@ module RunGame where
 import Man
 import Text.Show
 
+--Inteface for the implementation
 data Interface = Interface
   { iEmptyBoard :: Morris
   , iFullHand   :: Man -> HandMan
   , iPrintBoard :: Morris -> String
   , iBlanks     :: Morris -> [(Int,Int)]
   , iParseNumber :: Int -> (Int,Int)
-  , iParseBlanks :: [(Int,Int)] -> [Int]
+  , iparseCoordinate :: [(Int,Int)] -> [Int]
   , iPossibleMoves :: Morris -> (Int,Int) -> [Int]
   , iMenInHand  :: HandMan -> Int
   , iCheckPos   :: Morris -> (Int,Int) -> Maybe Man
@@ -21,10 +22,12 @@ data Interface = Interface
   , iGameOver   :: Morris -> (Bool,Maybe Man)
   }
 
+--sets up the game
 runGame :: Interface -> IO ()
 runGame i = do
     putStrLn "Welcome to the Nine men's morris!"
     phaseOne i (iEmptyBoard i) (iFullHand i Black) (iFullHand i White)
+
 
 phaseOne :: Interface -> Morris -> HandMan -> HandMan -> IO ()
 phaseOne i board Empty Empty = phaseTwo i board
@@ -32,7 +35,7 @@ phaseOne i board (Add player1 hand) (Add player2 hand2) = do
     putStrLn ("Black: " ++ show (iMenInHand i (Add player1 hand)) ++ "\nWhite: " ++ show (iMenInHand i (Add player2 hand2)))
     putStrLn (iPrintBoard i board)
     putStrLn ("Black's turn")
-    putStrLn ("Possible places: " ++  show (iParseBlanks i (iBlanks i board)))
+    putStrLn ("Possible places: " ++  show (iparseCoordinate i (iBlanks i board)))
     input <- getLine
     let number = (read input :: Int)
     let board2 = iUpdateBoard i board (Just player1) (iParseNumber i number)
@@ -44,7 +47,7 @@ phaseOne i board (Add player1 hand) (Add player2 hand2) = do
                 else
                 do return tempBoard
     putStrLn ("White's turn")
-    putStrLn ("Possible places: " ++  show (iParseBlanks i (iBlanks i board2)))
+    putStrLn ("Possible places: " ++  show (iparseCoordinate i (iBlanks i board2)))
     input <- getLine
     let number = (read input :: Int)
     let board3 = iUpdateBoard i board2 (Just player2) (iParseNumber i number)
@@ -62,7 +65,7 @@ phaseTwo :: Interface -> Morris -> IO ()
 phaseTwo i board = do
   putStrLn ("Phase two: Move men and form mills")
   putStrLn (iPrintBoard i board)
-  putStrLn ("Black's turn \n choose man to move:" ++ show (iParseBlanks i (iMenToMove i board Black)))
+  putStrLn ("Black's turn \n choose man to move:" ++ show (iparseCoordinate i (iMenToMove i board Black)))
   input <- getLine
   let curPos = (read input :: Int)
   putStrLn ("Possible Moves: " ++ show  (iPossibleMoves i board (iParseNumber i curPos)))
@@ -76,7 +79,7 @@ phaseTwo i board = do
               showAndRemoveMan i tempBoard (Just White) (iMill i tempBoard (iParseNumber i destPos) (White))
               else
               do return tempBoard
-  putStrLn ("White's turn \n choose man to move:" ++ show (iParseBlanks i (iMenToMove i board2 White)))
+  putStrLn ("White's turn \n choose man to move:" ++ show (iparseCoordinate i (iMenToMove i board2 White)))
   input <- getLine
   let curPosWhite = (read input :: Int)
   putStrLn ("Possible Moves: " ++ show  (iPossibleMoves i board2 (iParseNumber i curPosWhite)))
@@ -105,7 +108,7 @@ showAndRemoveMan i board playerToRemove listOfMills = do
   putStrLn ("Board:")
   putStrLn (iPrintBoard i board)
   putStrLn ("Choose man to remove:")
-  putStrLn (show (iParseBlanks i (iMans i board playerToRemove)))
+  putStrLn (show (iparseCoordinate i (iMans i board playerToRemove)))
   input <- getLine
   let number = (read input :: Int)
   let board2 = iRemoveMan i board (iParseNumber i number)

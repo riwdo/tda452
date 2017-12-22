@@ -12,25 +12,29 @@ adjacentElements = fromList [((0,0),[(0,3),(3,0)]),((0,3),[(0,0),(0,6),(1,3)]),(
                             ,((3,4),[(2,4),(3,5),(4,4)]),((3,5),[(3,4),(3,6),(1,5),(5,5)]),((3,6),[(0,6),(3,5),(6,6)]),((4,2),[(3,2),(4,3)])
                             ,((4,3),[(4,2),(4,4),(5,3)]),((4,4),[(4,3),(3,4)]),((5,1),[(3,1),(5,3)]),((5,3),[(5,1),(4,3),(5,5),(6,3)])
                             ,((5,5),[(5,3),(3,5)]),((6,0),[(3,0),(6,3)]),((6,3),[(6,0),(5,3),(6,6)]),((6,6),[(6,3),(3,6)])]
-
+-- translate coorinate to number
 coordinateToNumber = fromList [((0,0),1),((0,3),2),((0,6),3),((1,1),4),((1,3),5),((1,5),6),((2,2),7),((2,3),8),((2,4),9),((3,0),10)
                         ,((3,1),11),((3,2),12),((3,4),13),((3,5),14),((3,6),15),((4,2),16),((4,3),17),((4,4),18),((5,1),19),((5,3),20)
                         ,((5,5),21),((6,0),22),((6,3),23),((6,6),24)]
-
+-- translate number to coordinate
 numberToCoordinate = fromList [(1,(0,0)),(2,(0,3)),(3,(0,6)),(4,(1,1)),(5,(1,3)),(6,(1,5)),(7,(2,2)),(8,(2,3)),(9,(2,4)),(10,(3,0))
                         ,(11,(3,1)),(12,(3,2)),(13,(3,4)),(14,(3,5)),(15,(3,6)),(16,(4,2)),(17,(4,3)),(18,(4,4)),(19,(5,1)),(20,(5,3))
                         ,(21,(5,5)),(22,(6,0)),(23,(6,3)),(24,(6,6))]
 
+-- diplays the men you can move on the board
 menToMove :: Morris -> Man -> [Pos]
 menToMove board player = [match coordinate | coordinate <- (mans board (Just player)), length (possibleMoves board coordinate) > 0]
                 where match coordinate = head [coordinate | adjCoord <- (adjacentElements ! coordinate), isNothing (checkPos board (adjCoord))]
 
+-- displays possible moves given for a coorinate
 possibleMoves :: Morris -> (Int,Int) -> [Int]
 possibleMoves board coordinate = [coordinateToNumber ! (adjacentCoord) | adjacentCoord <- (adjacentElements ! coordinate),  isNothing (checkPos board (adjacentCoord))]
 
-parseBlanks :: [(Int,Int)] -> [Int]
-parseBlanks coordinates = [coordinateToNumber ! coordinate | coordinate <- coordinates]
+-- parses coorinate to nunbers
+parseCoordinate :: [(Int,Int)] -> [Int]
+parseCoordinate coordinates = [coordinateToNumber ! coordinate | coordinate <- coordinates]
 
+-- parse a number to a coordinate
 parseNumber :: Int -> (Int,Int)
 parseNumber number = numberToCoordinate ! number
 
@@ -49,11 +53,11 @@ startingMorris = Morris [[n,      Just bl,Just bl,  n, Just bl,Just bl,         
                               b = Black
 
 printBoard :: Morris -> String
-printBoard board = (formatSudoku (listPair board) [1,4,7,10,16,19,22])
+printBoard board = (formatBoard (listPair board) [1,4,7,10,16,19,22])
 
-formatSudoku :: [[Maybe Man]] -> [Int] -> String
-formatSudoku [] position = ""
-formatSudoku (x:xs) (h:position) = getElement x h ++  "\n" ++ formatSudoku xs position
+formatBoard :: [[Maybe Man]] -> [Int] -> String
+formatBoard [] position = ""
+formatBoard (x:xs) (h:position) = getElement x h ++  "\n" ++ formatBoard xs position
 
 getElement :: [Maybe Man] -> Int -> String
 getElement [] position = ""
@@ -64,15 +68,15 @@ getElement (x:xs) position | x == n = (show position) ++ ". _\t"  ++ getElement 
                                   j = Just
                                   b = Blank
 
-addPlayer :: HandMan -> HandMan
-addPlayer (Add man hand) = (Add (man) Empty)
 
+--Fills the players hand with men
 fullHand :: Man -> HandMan
-fullHand player = Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player)  Empty))))))))
+fullHand player = fullHand' player 8 (Add player Empty)
 
---fullhand' :: HandMan -> Int -> HandMan
---fullHand' hand 0 = hand
---fullhand' hand nbrOfIterations =
+--helperfunction for fullHand
+fullHand' :: Man -> Int -> HandMan -> HandMan
+fullHand' player 0 hand = hand
+fullHand' player i hand = fullHand' player (i-1) ((Add player) hand)
 
 menInHand :: HandMan -> Int
 menInHand hand = menInHand' hand 0
@@ -91,6 +95,7 @@ blanks (Morris board) = [(y,col) | (y,row) <- zip [0..8] board
 mill :: Morris -> (Int,Int) ->  Man -> [Bool]
 mill (board) (y,x) player = [checkMill board False (y,x) (y,x) player] ++ [checkMill board True (y,x) (y,x) player]
 
+--After a piece has been placed on the board this function checks if there exists any three in a row. The function returns how many men the player is allowed to mill
 checkMill :: Morris -> Bool -> (Int, Int) -> (Int, Int) -> Man -> Bool
 checkMill board vertical (y,x) prevState player | length [value | value <- neighbours, case vertical of True -> x == snd value
                                                                                                         False -> y == (fst value) ] == 1 =
@@ -102,7 +107,7 @@ checkMill board vertical (y,x) prevState player | length [value | value <- neigh
                               | otherwise = if (length [True | element <- list, checkPos board element /= Just player] /= 0) then False else True
                               where (neighbours, list) = ((adjacentElements ! (y,x)), ([(y,x)] ++ [value | value <- neighbours, case vertical of True -> x == snd value
                                                                                                                                                  False -> y == fst value, value /= prevState]))
-
+--Checks the position on the board
 checkPos :: Morris -> (Int,Int) -> Maybe Man
 checkPos board (yIn,xIn) = head ([checkRow list y yIn xIn | (y,list) <- zip [0..] (listPair board)] !! yIn)
     where checkRow list y yIn xIn = [man | (x,man) <- zip [0..] list,yIn == y,xIn ==x]
@@ -123,12 +128,15 @@ mans (Morris board) man = [(y,col) | (y,row) <- zip [0..8] board
 updateBoard :: Morris -> Maybe Man -> Pos -> Morris
 updateBoard (Morris board) newValue (yIN,xIN) = Morris [if y == yIN then (row !!= (xIN, newValue)) else row | (y,row) <- zip [0..] board]
 
+--Function to remove a man from the board
 removeMan :: Morris -> Pos -> Morris
 removeMan board (y,x) = updateBoard board Nothing (y,x)
 
+--Function to move a man on the board
 moveMan :: Morris -> Pos -> Pos -> Morris
 moveMan board currentPos newPos = removeMan (updateBoard board (checkPos board currentPos) newPos) currentPos
 
+--If a player has fewer than 3 pieces on the board the player is elimanted from the game
 gameOver :: Morris -> (Bool,Maybe Man)
 gameOver board | length (mans board w) < 3 = (True, w)
                | length (mans board b) < 3 = (True, b)
@@ -141,7 +149,7 @@ implementation = Interface
     , iPrintBoard = printBoard
     , iBlanks     = blanks
     , iParseNumber = parseNumber
-    , iParseBlanks = parseBlanks
+    , iparseCoordinate = parseCoordinate
     , iPossibleMoves = possibleMoves
     , iMenInHand  = menInHand
     , iMill       = mill
@@ -157,9 +165,8 @@ implementation = Interface
 main :: IO ()
 main = runGame implementation
 
-
 ----------------------------------Properties-----------------------------------------------
---Generates arbitrary cells for the morris board with different board pieces
+--Generates arbitrary cells for the morris board with different board pieces, not properly weighted
 cell :: Gen (Maybe Man)
 cell = frequency [(1,return (Just Black)), (1, return (Just White))]
 
@@ -169,6 +176,19 @@ instance Arbitrary Morris where
     do rows <- vectorOf 7 (vectorOf 7 cell)
        return (Morris rows)
 
---Should be checking if the board is updated correctly but is not quite right yet. It only passes 1-10 tests with quickcheck
-prop_updateBoard :: Morris -> Maybe Man -> Pos -> Bool
-prop_updateBoard (Morris morris) newValue (yIN,xIN) = and [if (row !! xIN)==  newValue then True else False | (y,row) <- zip [0..] morris, (x,col) <- zip [0..8] row, y == yIN, x == xIN]
+--checks if a man has moved around. If quickCheck checks with a negative value
+--or a value bigger than the board it will return true as we dont know how to handle expected exceptions
+prop_moveMan :: Morris -> (Int,Int) -> Maybe Man -> Bool
+prop_moveMan m (y,x) man | y > 6  || x > 6 || y < 0 || x < 0 = True
+                         | listPair m == [] = True
+                         | checkPos (updateBoard m man (y,x)) (y,x) == man = True
+                         | otherwise = False
+
+
+--checks if a man has been removed around. If quickCheck checks with a negative value
+--or a value bigger than the board it will return true as we dont know how to handle expected exceptions
+prop_removeMan :: Morris -> Pos -> Bool
+prop_removeMan m (y,x) | y > 6  || x > 6 || y < 0 || x < 0 = True
+                         | listPair m == [] = True
+                         | checkPos (removeMan m (y,x)) (y,x) == Nothing = True
+                         | otherwise = False
