@@ -13,19 +13,33 @@ adjacentElements = fromList [((0,0),[(0,3),(3,0)]),((0,3),[(0,0),(0,6),(1,3)]),(
                             ,((4,3),[(4,2),(4,4),(5,3)]),((4,4),[(4,3),(3,4)]),((5,1),[(3,1),(5,3)]),((5,3),[(5,1),(4,3),(5,5),(6,3)])
                             ,((5,5),[(5,3),(3,5)]),((6,0),[(3,0),(6,3)]),((6,3),[(6,0),(5,3),(6,6)]),((6,6),[(6,3),(3,6)])]
 
+coordinateToNumber = fromList [((0,0),1),((0,3),2),((0,6),3),((1,1),4),((1,3),5),((1,5),6),((2,2),7),((2,3),8),((2,4),9),((3,0),10)
+                        ,((3,1),11),((3,2),12),((3,4),13),((3,5),14),((3,6),15),((4,2),16),((4,3),17),((4,4),18),((5,1),19),((5,3),20)
+                        ,((5,5),21),((6,0),22),((6,3),23),((6,6),24)]
+
+numberToCoordinate = fromList [(1,(0,0)),(2,(0,3)),(3,(0,6)),(4,(1,1)),(5,(1,3)),(6,(1,5)),(7,(2,2)),(8,(2,3)),(9,(2,4)),(10,(3,0))
+                        ,(11,(3,1)),(12,(3,2)),(13,(3,4)),(14,(3,5)),(15,(3,6)),(16,(4,2)),(17,(4,3)),(18,(4,4)),(19,(5,1)),(20,(5,3))
+                        ,(21,(5,5)),(22,(6,0)),(23,(6,3)),(24,(6,6))]
+
 menToMove :: Morris -> Man -> [Pos]
 menToMove board player = [match coordinate | coordinate <- (mans board (Just player)), length (possibleMoves board coordinate) > 0]
-                where match coordinate = head [adjCoord | adjCoord <- (adjacentElements ! coordinate), isNothing (checkPos board (adjCoord))]
+                where match coordinate = head [coordinate | adjCoord <- (adjacentElements ! coordinate), isNothing (checkPos board (adjCoord))]
 
-possibleMoves :: Morris -> (Int,Int) -> [(Int,Int)]
-possibleMoves board coordinate = [adjacentCoord | adjacentCoord <- (adjacentElements ! coordinate),  isNothing (checkPos board (adjacentCoord))]
+possibleMoves :: Morris -> (Int,Int) -> [Int]
+possibleMoves board coordinate = [coordinateToNumber ! (adjacentCoord) | adjacentCoord <- (adjacentElements ! coordinate),  isNothing (checkPos board (adjacentCoord))]
+
+parseBlanks :: [(Int,Int)] -> [Int]
+parseBlanks coordinates = [coordinateToNumber ! coordinate | coordinate <- coordinates]
+
+parseNumber :: Int -> (Int,Int)
+parseNumber number = numberToCoordinate ! number
 
 -- Empty board
 startingMorris :: Morris
-startingMorris = Morris [[Just b,      Just bl,Just bl,  Just b, Just bl,Just bl,          n]
+startingMorris = Morris [[n,      Just bl,Just bl,  n, Just bl,Just bl,          n]
                         ,[Just bl,   n,   Just bl,  n, Just bl,   n,       Just bl]
                         ,[Just bl,Just bl,    n,    n,    n,   Just bl,    Just bl]
-                        ,[Just b,         n,       n, Just bl, n,      n,             n]
+                        ,[n,         n,       n, Just bl, n,      n,             n]
                         ,[Just bl,Just bl,    n,    n,    n,   Just bl,    Just bl]
                         ,[Just bl,   n,    Just bl, n, Just bl,   n,       Just bl]
                         ,[n,      Just bl, Just bl, n, Just bl,Just bl,         n]]
@@ -34,27 +48,38 @@ startingMorris = Morris [[Just b,      Just bl,Just bl,  Just b, Just bl,Just bl
                               w = White
                               b = Black
 
-printBoard :: Morris -> IO ()
-printBoard board = putStrLn (formatSudoku (listPair board))
+printBoard :: Morris -> String
+printBoard board = (formatSudoku (listPair board) [1,4,7,10,16,19,22])
 
-formatSudoku :: [[Maybe Man]] -> String
-formatSudoku [] = ""
-formatSudoku (x:xs) = getElement x ++  "\n" ++ formatSudoku xs
+formatSudoku :: [[Maybe Man]] -> [Int] -> String
+formatSudoku [] position = ""
+formatSudoku (x:xs) (h:position) = getElement x h ++  "\n" ++ formatSudoku xs position
 
-getElement :: [Maybe Man] -> String
-getElement [] = ""
-getElement (x:xs) | x == n = "_\t" ++ getElement xs
-                  | x == (Just Blank) = "\t" ++ getElement xs
-                  | otherwise = (Prelude.take 1 (show (fromJust x))) ++ "\t"++ getElement xs
-                  where n = Nothing
-                        j = Just
-                        b = Blank
+getElement :: [Maybe Man] -> Int -> String
+getElement [] position = ""
+getElement (x:xs) position | x == n = (show position) ++ ". _\t"  ++ getElement xs (position+1)
+                           | x == (Just Blank) = "\t" ++ getElement xs position
+                           | otherwise = (show position) ++ ". " ++ (Prelude.take 1 (show (fromJust x))) ++ "\t"++ getElement xs ((position)+1)
+                            where n = Nothing
+                                  j = Just
+                                  b = Blank
 
 addPlayer :: HandMan -> HandMan
 addPlayer (Add man hand) = (Add (man) Empty)
 
 fullHand :: Man -> HandMan
-fullHand player = Add (player) (Add (player) (Add (player) (Add (player)  Empty)))
+fullHand player = Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player) (Add (player)  Empty))))))))
+
+--fullhand' :: HandMan -> Int -> HandMan
+--fullHand' hand 0 = hand
+--fullhand' hand nbrOfIterations =
+
+menInHand :: HandMan -> Int
+menInHand hand = menInHand' hand 0
+
+menInHand' :: HandMan -> Int -> Int
+menInHand' Empty nbrOfMen = nbrOfMen
+menInHand' (Add player hand) nbrOfMen = menInHand' hand (nbrOfMen+1)
 
 -- Get all blank positions
 blanks :: Morris -> [(Int,Int)]
@@ -115,9 +140,13 @@ implementation = Interface
     , iFullHand   = fullHand
     , iPrintBoard = printBoard
     , iBlanks     = blanks
-    , iGetAdjacentElements = possibleMoves
+    , iParseNumber = parseNumber
+    , iParseBlanks = parseBlanks
+    , iPossibleMoves = possibleMoves
+    , iMenInHand  = menInHand
     , iMill       = mill
     , iCheckPos   = checkPos
+    , iMenToMove  = menToMove
     , iMans       = mans
     , iUpdateBoard= updateBoard
     , iRemoveMan  = removeMan
